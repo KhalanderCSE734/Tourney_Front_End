@@ -3,6 +3,7 @@ import './CSS/OrganizerDashboard.css';
 
 
 import { IoPersonCircleOutline, IoEllipsisVertical, IoCheckmarkCircle, IoClose, IoChevronForward, IoAdd, IoBusinessOutline } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 
 // SVG Icon Components (existing)
 const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
@@ -23,6 +24,7 @@ const OrganizerDashboard = ({ toggleSidebar }) => {
   // NEW: State to manage the active organization tab
   const [activeOrgTab, setActiveOrgTab] = useState('My organization');
 
+  const navigate = useNavigate();
 
 
   
@@ -48,7 +50,7 @@ const OrganizerDashboard = ({ toggleSidebar }) => {
           <h1>Dashboard Overview</h1>
           <p>Welcome back! Here's what's happening with your tournaments.</p>
         </div>
-        <button className="create-tournament-btn">
+        <button className="create-tournament-btn" onClick={()=>{navigate('/organizer/createTournament')}}>
           <PlusIcon /> Create New Tournament
         </button>
       </header>
@@ -441,6 +443,10 @@ const MembersList = () => {
 
 
 const SwitchOrganization = () => {
+
+  const navigate = useNavigate();
+
+
   const [organizations] = useState([
     {
       id: 1,
@@ -512,7 +518,7 @@ const SwitchOrganization = () => {
           </div>
 
           <div className="org-switcher-actions">
-            <button className="org-switcher-create">
+            <button className="org-switcher-create" onClick={()=>{navigate('/signup/organizer')}}>
               <IoAdd className="org-switcher-plus" />
               Create New Organization
             </button>

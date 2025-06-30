@@ -11,6 +11,7 @@ import SignUpOptions from './Components/SignUpOptions';
 
 import OrganizerHome from './Pages/Organizer/OrganizerHome';
 import OrganizerTournament from './Pages/Organizer/OrganizerTournament';
+import CreateTournament from './Pages/Organizer/CreateTournament';
 
 
 
@@ -35,6 +36,7 @@ const App = () => {
 
         <Route path='/organizer/home' element={<OrganizerHome/>}/>
         <Route path='/organizer/tournaments' element={<OrganizerTournament/>}/>
+        <Route path='/organizer/createTournament' element={<CreateTournament/>}/>
 
 
         {/* Auth Routes */}

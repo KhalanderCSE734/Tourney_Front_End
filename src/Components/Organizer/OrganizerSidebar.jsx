@@ -43,21 +43,21 @@ const OrganizerSidebar = ({ isOpen, toggleSidebar }) => {
               </NavLink>
             </li>
             <li className="nav-item">
-              <Link>
+              <Link to='/organizer/createTournament'>
                 <span className="icon"><PlusIcon /></span>
                 Create Tournament
               </Link>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <a href="#">
                 <span className="icon"><SettingsIcon /></span>
                 Settings
               </a>
-            </li>
+            </li> */}
           </ul>
         </nav>
       </div>
-      <div className="user-profile">
+      {/* <div className="user-profile">
         <div className="avatar">
           <UserIcon />
         </div>
@@ -65,7 +65,7 @@ const OrganizerSidebar = ({ isOpen, toggleSidebar }) => {
           <p className="name">John Organizer</p>
           <p className="email">john@example.com</p>
         </div>
-      </div>
+      </div> */}
     </aside>
   );
 };

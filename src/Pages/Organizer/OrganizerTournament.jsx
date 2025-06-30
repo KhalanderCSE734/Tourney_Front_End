@@ -11,10 +11,13 @@ import { IoAdd, IoSearchOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, 
 import {OrganizerContext} from '../../Contexts/OrganizerContext/OrganizerContext';
 
 import { useContext, useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 
 const OrganizerTournament = () => {
+
+  const navigate = useNavigate();
   
   const { isSidebarOpen, setSidebarOpen, toggleSidebar } = useContext(OrganizerContext);
   
@@ -129,7 +132,7 @@ const OrganizerTournament = () => {
               <h1 className="organizer-tournament-main-title">My Tournaments</h1>
               <p className="organizer-tournament-subtitle">Manage all your tournaments and events</p>
             </div>
-            <button className="organizer-tournament-create-btn">
+            <button className="organizer-tournament-create-btn" onClick={()=>{ navigate('/organizer/createTournament'); }}>
               <IoAdd className="organizer-tournament-create-icon" />
               Create New Tournament
             </button>
