@@ -15,9 +15,16 @@ const OrganizerContext = createContext();
 
 const OrganizerContextProvider = (props)=>{
     
+
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
+      const toggleSidebar = () => {
+        setSidebarOpen(!isSidebarOpen);
+      };
+
+
     
     const value = {
-    
+        isSidebarOpen, setSidebarOpen, toggleSidebar
     };
     
     

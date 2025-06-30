@@ -3,9 +3,15 @@ import React from 'react'
 import '../CSS/PlayerLogin.css';
 
 import {useState} from 'react';
-import { IoChevronBack } from 'react-icons/io5';
+import { IoChevronBack, IoLogoGoogle } from 'react-icons/io5';
+
+import {useNavigate} from 'react-router-dom';
 
 const PlayerLogin = () => {
+
+  const navigate = useNavigate();
+
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -33,20 +39,19 @@ const PlayerLogin = () => {
     }, 1500);
   };
 
-  const handleBackToRoleSelection = () => {
-    // Handle navigation back to role selection
-    console.log('Back to role selection');
+  const handleGoogleLogin = () => {
+    // Handle Google login
+    console.log('Google login initiated');
   };
 
-  const handleSignUp = () => {
-    // Handle navigation to sign up
-    console.log('Navigate to sign up');
-  };
+  
+
+ 
 
   return (
     <div className="player-login-container">
       <div className="player-login-wrapper">
-        <button className="player-back-button" onClick={handleBackToRoleSelection}>
+        <button className="player-back-button" onClick={()=>{navigate('/roleSelection')}}>
           <IoChevronBack className="player-back-icon" />
           Back to role selection
         </button>
@@ -97,12 +102,27 @@ const PlayerLogin = () => {
               {isSubmitting ? 'Signing In...' : 'Sign In'}
             </button>
 
+            <div className="player-login-divider">
+              <span className="player-divider-line"></span>
+              <span className="player-divider-text">or</span>
+              <span className="player-divider-line"></span>
+            </div>
+
+            <button 
+              type="button" 
+              className="player-google-login-button"
+              onClick={handleGoogleLogin}
+            >
+              <IoLogoGoogle className="player-google-icon" />
+              Continue with Google
+            </button>
+
             <div className="player-signup-prompt">
               <span className="player-signup-text">Don't have an account? </span>
               <button 
                 type="button" 
                 className="player-signup-link"
-                onClick={handleSignUp}
+                onClick={()=>{ navigate('/signup/player') }}
               >
                 Sign up
               </button>

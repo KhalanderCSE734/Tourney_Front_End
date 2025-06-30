@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import '../CSS/PlayerSignUp.css';
 import { IoChevronBack, IoCloudUploadOutline, IoCalendarOutline } from 'react-icons/io5';
 
+import {useNavigate} from 'react-router-dom';
+
+
 const PlayerSignUp = () => {
+
+  const navigate = useNavigate();
+
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -46,13 +53,7 @@ const PlayerSignUp = () => {
     }, 1500);
   };
 
-  const handleBackToRoleSelection = () => {
-    console.log('Back to role selection');
-  };
 
-  const handleSignIn = () => {
-    console.log('Navigate to sign in');
-  };
 
   const isFormValid = () => {
     return formData.fullName.trim() && 
@@ -65,7 +66,7 @@ const PlayerSignUp = () => {
   return (
     <div className="player-registration-container">
       <div className="player-registration-wrapper">
-        <button className="player-reg-back-button" onClick={handleBackToRoleSelection}>
+        <button className="player-reg-back-button" onClick={()=>{navigate('/roleSelection')}}>
           <IoChevronBack className="player-reg-back-icon" />
           Back to role selection
         </button>
@@ -144,7 +145,7 @@ const PlayerSignUp = () => {
               <label htmlFor="dateOfBirth" className="player-reg-form-label">
                 Date of Birth
               </label>
-              <div className="player-reg-date-input-wrapper">
+              <label className="player-reg-date-input-wrapper" htmlFor='dateOfBirth'>
                 <input
                   type="date"
                   id="dateOfBirth"
@@ -156,7 +157,7 @@ const PlayerSignUp = () => {
                   required
                 />
                 <IoCalendarOutline className="player-reg-date-icon" />
-              </div>
+              </label>
             </div>
 
             <div className="player-reg-form-group">
@@ -194,7 +195,7 @@ const PlayerSignUp = () => {
               <button 
                 type="button" 
                 className="player-reg-signin-link"
-                onClick={handleSignIn}
+                onClick={()=>{navigate('/login/player')}}
               >
                 Sign in
               </button>

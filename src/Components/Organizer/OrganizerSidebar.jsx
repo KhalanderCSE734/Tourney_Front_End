@@ -1,6 +1,14 @@
 import React from 'react';
 import './CSS/OrganizerSidebar.css';
 
+import { Link,NavLink, useNavigate } from 'react-router-dom';
+
+
+import OrganizerContextProvider from '../../Contexts/OrganizerContext/OrganizerContext';
+
+import { useContext } from 'react';
+
+
 // SVG Icon Components
 const GridIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>;
 const TrophyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V22h4v-7.34"/><path d="M12 9.5L14.5 2H9.5L12 9.5z"/><path d="M7 14h10"/></svg>;
@@ -23,22 +31,22 @@ const OrganizerSidebar = ({ isOpen, toggleSidebar }) => {
         <nav className="sidebar-nav">
           <ul>
             <li className="nav-item">
-              <a href="#" className="active">
+              <NavLink to='/organizer/home'>
                 <span className="icon"><GridIcon /></span>
                 Dashboard
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a href="#">
+              <NavLink to='/organizer/tournaments'>
                 <span className="icon"><TrophyIcon /></span>
                 My Tournaments
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a href="#">
+              <Link>
                 <span className="icon"><PlusIcon /></span>
                 Create Tournament
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
               <a href="#">

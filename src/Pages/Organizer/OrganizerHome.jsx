@@ -4,9 +4,19 @@ import OrganizerDashboard from '../../Components/Organizer/OrganizerDashboard';
 import OrganizerSidebar from '../../Components/Organizer/OrganizerSidebar';
 
 
+
+import OrganizerContextProvider from '../../Contexts/OrganizerContext/OrganizerContext';
+
+import { useContext } from 'react';
+
+
+
 import './CSS/OrganizerHome.css';
 
 const OrganizerHome = () => {
+
+  // import { } = useContext(OrganizerContextProvider);
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   // Close sidebar when clicking outside of it on mobile
