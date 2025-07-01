@@ -1,24 +1,34 @@
 import React, { useState } from 'react';
 import './CSS/Events.css';
-import { IoAdd, IoSearchOutline, IoFilterOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoTrophyOutline, IoPeopleOutline } from 'react-icons/io5';
+import { IoAdd, IoSearchOutline, IoFilterOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoTrophyOutline, IoPeopleOutline, IoClose, IoHelpCircleOutline } from 'react-icons/io5';
 
 const Events = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newEventData, setNewEventData] = useState({
+    eventName: '',
+    eventType: 'singles',
+    matchType: 'knockout',
+    maxTeams: '',
+    teamEntryFee: '',
+    allowBooking: true,
+    offers: ''
+  });
 
-  // Mock events data based on the uploaded image
-  const [events] = useState([
+  // Mock events data
+  const [events, setEvents] = useState([
     { id: 1, name: 'U9 BS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-    { id: 2, name: 'U9 GS', eventType: 'singles', fee: 'INR 699', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 2, name: 'U9 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
     { id: 3, name: 'U11 BS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Inactive' },
-    { id: 4, name: 'U11 GS', eventType: 'singles', fee: 'INR 509', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-    { id: 5, name: 'U13 BS', eventType: 'singles', fee: 'INR 495', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-    { id: 6, name: 'U13 GS', eventType: 'singles', fee: 'INR 899', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-    { id: 7, name: 'U15 BS', eventType: 'singles', fee: 'INR 999', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-    { id: 8, name: 'U15 GS', eventType: 'singles', fee: 'INR 1099', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-    { id: 9, name: 'U17 BS', eventType: 'singles', fee: 'INR 535', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-    { id: 10, name: 'U17 GS', eventType: 'singles', fee: 'INR 799', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 4, name: 'U11 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 5, name: 'U13 BS', eventType: 'singles', fee: 'INR 595', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 6, name: 'U13 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 7, name: 'U15 BS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 8, name: 'U15 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 9, name: 'U17 BS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
+    { id: 10, name: 'U17 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
   ]);
 
   const filteredEvents = events.filter(event => {
@@ -29,7 +39,46 @@ const Events = () => {
   });
 
   const handleCreateEvent = () => {
-    console.log('Create new event');
+    setShowCreateModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setNewEventData({
+      eventName: '',
+      eventType: 'singles',
+      matchType: 'knockout',
+      maxTeams: '',
+      teamEntryFee: '',
+      allowBooking: true,
+      offers: ''
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewEventData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleSubmitEvent = (e) => {
+    e.preventDefault();
+    
+    // Create new event
+    const newEvent = {
+      id: events.length + 1,
+      name: newEventData.eventName,
+      eventType: newEventData.eventType,
+      fee: newEventData.teamEntryFee ? `INR ${newEventData.teamEntryFee}` : 'Free',
+      matchType: newEventData.matchType,
+      maxTeam: newEventData.maxTeams || '-',
+      allowBooking: newEventData.allowBooking ? 'Active' : 'Inactive'
+    };
+
+    setEvents(prev => [...prev, newEvent]);
+    handleCloseModal();
   };
 
   const handleViewEvent = (eventId) => {
@@ -195,6 +244,217 @@ const Events = () => {
           </div>
         </div>
       </div>
+
+      {/* Create Event Modal */}
+      {showCreateModal && (
+        <div className="events-modal-overlay" onClick={handleCloseModal}>
+          <div className="events-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="events-modal-header">
+              <div className="events-modal-title-section">
+                <h2 className="events-modal-title">ADD NEW EVENT</h2>
+                <p className="events-modal-subtitle">Create a new event for your tournament</p>
+              </div>
+              <button className="events-modal-close-btn" onClick={handleCloseModal}>
+                <IoClose />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitEvent} className="events-modal-form">
+              {/* Event Name */}
+              <div className="events-form-group">
+                <label className="events-form-label">
+                  EVENT NAME <span className="events-required">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="eventName"
+                  value={newEventData.eventName}
+                  onChange={handleInputChange}
+                  placeholder="e.g. Men's singles"
+                  className="events-form-input"
+                  required
+                />
+              </div>
+
+              {/* Event Type */}
+              <div className="events-form-group">
+                <label className="events-form-label">
+                  EVENT TYPE <span className="events-required">*</span>
+                </label>
+                <div className="events-radio-group">
+                  <label className="events-radio-option">
+                    <input
+                      type="radio"
+                      name="eventType"
+                      value="singles"
+                      checked={newEventData.eventType === 'singles'}
+                      onChange={handleInputChange}
+                      className="events-radio-input"
+                    />
+                    <span className="events-radio-label">Singles</span>
+                  </label>
+                  <label className="events-radio-option">
+                    <input
+                      type="radio"
+                      name="eventType"
+                      value="doubles"
+                      checked={newEventData.eventType === 'doubles'}
+                      onChange={handleInputChange}
+                      className="events-radio-input"
+                    />
+                    <span className="events-radio-label">Doubles</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Match Type */}
+              <div className="events-form-group">
+                <label className="events-form-label">
+                  MATCH TYPE <span className="events-required">*</span>
+                  <button type="button" className="events-help-btn" title="Fixture Calculator Helper">
+                    <IoHelpCircleOutline />
+                    <span className="events-help-text">FIXTURE CALCULATOR HELPER</span>
+                  </button>
+                </label>
+                <div className="events-radio-group">
+                  <label className="events-radio-option">
+                    <input
+                      type="radio"
+                      name="matchType"
+                      value="knockout"
+                      checked={newEventData.matchType === 'knockout'}
+                      onChange={handleInputChange}
+                      className="events-radio-input"
+                    />
+                    <span className="events-radio-label">Knockout</span>
+                  </label>
+                  <label className="events-radio-option">
+                    <input
+                      type="radio"
+                      name="matchType"
+                      value="round-robin"
+                      checked={newEventData.matchType === 'round-robin'}
+                      onChange={handleInputChange}
+                      className="events-radio-input"
+                    />
+                    <span className="events-radio-label">Round Robin</span>
+                  </label>
+                  <label className="events-radio-option">
+                    <input
+                      type="radio"
+                      name="matchType"
+                      value="round-robin-knockout"
+                      checked={newEventData.matchType === 'round-robin-knockout'}
+                      onChange={handleInputChange}
+                      className="events-radio-input"
+                    />
+                    <span className="events-radio-label">Round Robin + Knockout</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Maximum Teams */}
+              <div className="events-form-group">
+                <label className="events-form-label">
+                  MAXIMUM NUMBER OF TEAMS CAN PARTICIPATE
+                  <button type="button" className="events-info-btn" title="Information">
+                    <IoHelpCircleOutline />
+                  </button>
+                </label>
+                <input
+                  type="number"
+                  name="maxTeams"
+                  value={newEventData.maxTeams}
+                  onChange={handleInputChange}
+                  placeholder="e.g. 50"
+                  className="events-form-input"
+                />
+              </div>
+
+              {/* Team Entry Fee */}
+              <div className="events-form-group">
+                <label className="events-form-label">
+                  TEAM ENTRY FEE
+                  <button type="button" className="events-info-btn" title="Information">
+                    <IoHelpCircleOutline />
+                  </button>
+                </label>
+                <div className="events-fee-input-wrapper">
+                  <span className="events-currency-prefix">INR</span>
+                  <input
+                    type="number"
+                    name="teamEntryFee"
+                    value={newEventData.teamEntryFee}
+                    onChange={handleInputChange}
+                    placeholder="0"
+                    className="events-form-input events-fee-input"
+                  />
+                </div>
+              </div>
+
+              {/* Allow Booking */}
+              <div className="events-form-group">
+                <label className="events-form-label">
+                  ALLOW BOOKING
+                  <button type="button" className="events-info-btn" title="Information">
+                    <IoHelpCircleOutline />
+                  </button>
+                </label>
+                <div className="events-toggle-wrapper">
+                  <label className="events-toggle">
+                    <input
+                      type="checkbox"
+                      name="allowBooking"
+                      checked={newEventData.allowBooking}
+                      onChange={handleInputChange}
+                      className="events-toggle-input"
+                    />
+                    <span className="events-toggle-slider"></span>
+                  </label>
+                  <span className="events-toggle-label">
+                    {newEventData.allowBooking ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Offers */}
+              <div className="events-form-group">
+                <label className="events-form-label">OFFERS (IN %)</label>
+                <div className="events-offers-input-wrapper">
+                  <input
+                    type="number"
+                    name="offers"
+                    value={newEventData.offers}
+                    onChange={handleInputChange}
+                    placeholder="0"
+                    className="events-form-input events-offers-input"
+                    min="0"
+                    max="100"
+                  />
+                  <span className="events-percentage-suffix">%</span>
+                </div>
+              </div>
+
+              {/* Form Actions */}
+              <div className="events-modal-actions">
+                <button 
+                  type="button" 
+                  className="events-modal-btn events-modal-cancel"
+                  onClick={handleCloseModal}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="events-modal-btn events-modal-save"
+                >
+                  Save
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredEvents.length === 0 && (
