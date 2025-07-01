@@ -8,6 +8,7 @@ import Notification from './Notification';
 import Payments from './Payments';
 import Scores from './Scores';
 import Settings from './Settings';
+import Fixtures from './Fixtures';
 
 
 const Tournament = () => {
@@ -243,7 +244,12 @@ const Tournament = () => {
           </div>
         )}
 
-        
+        {activeTab === 'fixtures' && (
+          <div className="tournament-tab-content">
+            <Fixtures />
+          </div>
+        )}
+
 
 
         
