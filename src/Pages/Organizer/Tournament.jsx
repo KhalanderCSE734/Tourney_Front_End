@@ -3,6 +3,12 @@ import './CSS/Tournament.css';
 import { IoCalendarOutline, IoLocationOutline, IoPeopleOutline, IoTrophyOutline, IoTimeOutline, IoShareOutline, IoBookmarkOutline, IoStatsChartOutline } from 'react-icons/io5';
 
 import Events from './Events';
+import Teams from './Teams';
+import Notification from './Notification';
+import Payments from './Payments';
+import Scores from './Scores';
+import Settings from './Settings';
+
 
 const Tournament = () => {
   const [activeTab, setActiveTab] = useState('basic-info');
@@ -220,8 +226,59 @@ const Tournament = () => {
           </div>
         )}
 
+        
+        {activeTab === 'teams' && (
+          <div className="tournament-tab-content">
+            <Teams />
+          </div>
+        )}
+
+
+
+        
+        {activeTab === 'notifications' && (
+          <div className="tournament-tab-content">
+            <Notification />
+
+          </div>
+        )}
+
+        
+
+
+        
+        {activeTab === 'payment' && (
+          <div className="tournament-tab-content">
+            <Payments />
+          </div>
+        )}
+
+
+
+
+        
+        {activeTab === 'live-scoring' && (
+          <div className="tournament-tab-content">
+            <Scores />
+          </div>
+        )}
+
+
+
+
+        
+        {activeTab === 'settings' && (
+          <div className="tournament-tab-content">
+            <Settings />
+          </div>
+        )}
+
+
+
+
+
         {/* Other tabs placeholder */}
-        {activeTab !== 'basic-info' && activeTab !== 'events' && (
+        {activeTab !== 'basic-info' && activeTab !== 'events' && activeTab !== 'teams' && activeTab !== 'notifications' && activeTab !== 'payment' && activeTab !== 'live-scoring' && activeTab !== 'settings' &&(
           <div className="tournament-placeholder-content">
             <div className="tournament-placeholder-card">
               <h2 className="tournament-placeholder-title">
