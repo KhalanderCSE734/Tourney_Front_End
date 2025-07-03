@@ -304,6 +304,7 @@ const MembersList = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberPassword, setNewMemberPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddMember = () => {
@@ -411,6 +412,19 @@ const MembersList = () => {
                   onChange={(e) => setNewMemberEmail(e.target.value)}
                   className="form-input"
                   placeholder="Enter member's email address"
+                  required
+                  autoFocus
+                />
+                <label htmlFor="memberEmail" className="form-label">
+                  Password <span className="required">*</span>
+                </label>
+                <input
+                  type="password"
+                  id="memberPass"
+                  value={newMemberPassword}
+                  onChange={(e) => setNewMemberPassword(e.target.value)}
+                  className="form-input"
+                  placeholder="Enter member's Password"
                   required
                   autoFocus
                 />

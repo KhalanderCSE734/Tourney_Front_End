@@ -17,7 +17,7 @@ import CreateTournament from './Pages/Organizer/CreateTournament';
 import Tournament from './Pages/Organizer/Tournament';
 import Events from './Pages/Organizer/Events';
 
-
+  import { ToastContainer, Bounce } from 'react-toastify';
 
 
 
@@ -27,6 +27,8 @@ import PlayerSignUp from './Components/Auth/Player/PlayerSignUp';
 import OrganizerLogin from './Components/Auth/Organizer/OrganizerLogin';
 import OrganizerSignUp from './Components/Auth/Organizer/OrganizerSignUp';
 import AdminLogin from './Components/Auth/Admin/AdminLogin';
+import Layout from './Components/Admin/components/layout/Layout';
+import DashboardPage from './Components/Admin/pages/dashboard/index';
 
 
 
@@ -59,10 +61,23 @@ const App = () => {
 
         {/* Admin Routes */}
         <Route path='/login/admin' element={<AdminLogin/>}/>
-        
-
+          <Route path="admin/dashboard" element={<DashboardPage />} />
 
       </Routes>
+
+      <ToastContainer
+position="top-center"
+autoClose={5000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick={false}
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="light"
+transition={Bounce}
+/>
       
     </div>
   )

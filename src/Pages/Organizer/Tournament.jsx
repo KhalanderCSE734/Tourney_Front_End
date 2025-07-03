@@ -284,7 +284,7 @@ const Tournament = () => {
 
 
         {/* Other tabs placeholder */}
-        {activeTab !== 'basic-info' && activeTab !== 'events' && activeTab !== 'teams' && activeTab !== 'notifications' && activeTab !== 'payment' && activeTab !== 'live-scoring' && activeTab !== 'settings' &&(
+        {/* {activeTab !== 'basic-info' && activeTab !== 'events' && activeTab !== 'teams' && activeTab !== 'notifications' && activeTab !== 'payment' && activeTab !== 'live-scoring' && activeTab !== 'settings' &&(
           <div className="tournament-placeholder-content">
             <div className="tournament-placeholder-card">
               <h2 className="tournament-placeholder-title">
@@ -295,7 +295,7 @@ const Tournament = () => {
               </p>
             </div>
           </div>
-        )}
+        )} */}
 
         
       </div>

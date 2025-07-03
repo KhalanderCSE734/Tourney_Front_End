@@ -9,6 +9,10 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+
+import { toast } from 'react-toastify';
+
+
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -119,7 +123,44 @@ const CreateTournament = () => {
     }
   };
 
+
+  
+  const handlePoster = (evt)=>{
+
+    const image = evt.target.files[0];
+
+    if(!image){
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(image);
+
+    reader.onload = async ()=>{
+      const base64Image = reader.result;
+      // setEditDetails((prev)=>{
+      //   return {...prev, profilePic: base64Image};
+      // })
+      setFormData(prev => ({
+        ...prev,
+        coverImage: base64Image
+      }));
+    }
+
+
+  }
+
+ 
+
+
+
+
   const handleNextStep = () => {
+    if(!formData.tournamentName || !formData.tournamentType || !formData.sport || !formData.startDate || !formData.endDate || !formData.location || !formData.coverImage){
+      toast.warn("All Fields are mandatory to fill");
+      return;
+    }
     setCurrentStep('details');
   };
 
@@ -342,13 +383,13 @@ const CreateTournament = () => {
 
             {/* Cover Image */}
             <div className="create-tournament-form-group-full">
-              <label className="create-tournament-label-full">Cover Image</label>
+              <label className="create-tournament-label-full">Tournament Poster</label>
               <div className="create-tournament-file-upload-wrapper-full">
                 <input
                   type="file"
                   id="coverImage"
                   name="coverImage"
-                  onChange={handleFileUpload}
+                  onChange={handlePoster}
                   className="create-tournament-file-input-full"
                   accept="image/*"
                 />
@@ -356,7 +397,7 @@ const CreateTournament = () => {
                   <IoCloudUploadOutline className="create-tournament-upload-icon-full" />
                   <div className="create-tournament-upload-content-full">
                     <span className="create-tournament-upload-text-full">
-                      {formData.coverImage ? formData.coverImage.name : 'Click to upload or drag and drop'}
+                      {formData.coverImage ? <img src={formData.coverImage}/> : 'Click to upload or drag and drop'}
                     </span>
                     <span className="create-tournament-upload-subtext-full">PNG, JPG or JPEG (MAX. 5MB)</span>
                   </div>
@@ -366,13 +407,13 @@ const CreateTournament = () => {
 
             {/* Action Buttons */}
             <div className="create-tournament-form-actions-full">
-              <button 
+              {/* <button 
                 type="button" 
                 className="create-tournament-btn-full create-tournament-btn-secondary-full"
                 onClick={handleSave}
               >
                 Save Draft
-              </button>
+              </button> */}
               <button 
                 type="button" 
                 className="create-tournament-btn-full create-tournament-btn-primary-full"
@@ -396,23 +437,34 @@ const CreateTournament = () => {
 
 const TournamentDetails = ({ formData, setFormData, onBack }) => {
   const [editorContent, setEditorContent] = useState(formData.description || '');
-  const [posterFile, setPosterFile] = useState(null);
+  // const [posterFile, setPosterFile] = useState(null);
   const [selectedText, setSelectedText] = useState('');
   const textareaRef = useRef(null);
 
-  const handlePosterUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPosterFile(file);
-    }
-  };
+  // const handlePosterUpload = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     setPosterFile(file);
+  //   }
+  // };
+
+  const handleDescription = (evt)=>{
+     setFormData(prev => ({
+      ...prev,
+      description: evt.target.value
+    }));
+  }
 
   const handleSave = () => {
-    setFormData(prev => ({
-      ...prev,
-      description: editorContent
-    }));
-    console.log('Tournament details saved');
+
+
+    
+    console.log('Tournament details saved',formData);
+
+
+
+
+
   };
 
   // Get selected text from textarea
@@ -436,11 +488,17 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
     if (textarea) {
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const beforeText = editorContent.substring(0, start);
-      const afterText = editorContent.substring(replaceSelected ? end : start);
+      const beforeText = formData.description.substring(0, start);
+      const afterText = formData.description.substring(replaceSelected ? end : start);
       
       const newContent = beforeText + insertText + afterText;
-      setEditorContent(newContent);
+      // setEditorContent(newContent);
+      setFormData((prev)=>{
+        return{
+          ...prev,
+          description:newContent
+        }
+      })
       
       // Set cursor position after inserted text
       setTimeout(() => {
@@ -455,11 +513,17 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
     const selection = getSelectedText();
     if (selection.text) {
       const wrappedText = prefix + selection.text + (suffix || prefix);
-      const beforeText = editorContent.substring(0, selection.start);
-      const afterText = editorContent.substring(selection.end);
+      const beforeText = formData.description.substring(0, selection.start);
+      const afterText = formData.description.substring(selection.end);
       
       const newContent = beforeText + wrappedText + afterText;
-      setEditorContent(newContent);
+      // setEditorContent(newContent);
+      setFormData((prev)=>{
+        return{
+          ...prev,
+          description:newContent
+        }
+      })
       
       // Maintain selection
       setTimeout(() => {
@@ -536,7 +600,7 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
                 <div className="create-tournament-editor-header-full">
                   <span className="create-tournament-editor-label-full">
                     DETAILS (5000 CHARACTERS) 
-                    <span className="create-tournament-char-count-full">{editorContent.length} characters</span>
+                    <span className="create-tournament-char-count-full">{formData.description.length} characters</span>
                   </span>
                 </div>
                 
@@ -649,8 +713,8 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
                 {/* Editor Content */}
                 <textarea
                   ref={textareaRef}
-                  value={editorContent}
-                  onChange={(e) => setEditorContent(e.target.value)}
+                  value={formData.description}
+                  onChange={(e) => { handleDescription(e) }}
                   className="create-tournament-editor-textarea-full"
                   placeholder="The Description of the event should be like this..."
                   maxLength={5000}
@@ -666,7 +730,7 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
               </div>
 
               {/* Tournament Poster */}
-              <div className="create-tournament-poster-section-full">
+              {/* <div className="create-tournament-poster-section-full">
                 <label className="create-tournament-label-full">TOURNAMENT POSTER</label>
                 <div className="create-tournament-poster-upload-full">
                   <input
@@ -689,7 +753,7 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
                     </div>
                   )}
                 </div>
-              </div>
+              </div> */}
 
               {/* Save Button */}
               <div className="create-tournament-details-actions">
@@ -709,8 +773,8 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
             <div className="create-tournament-preview-card-full">
               <h3 className="create-tournament-preview-title-full">LIVE PREVIEW</h3>
               <div className="create-tournament-preview-content-full">
-                {editorContent ? (
-                  <div dangerouslySetInnerHTML={{ __html: convertToHTML(editorContent) }} />
+                {formData.description ? (
+                  <div dangerouslySetInnerHTML={{ __html: convertToHTML(formData.description) }} />
                 ) : (
                   <p style={{ color: '#9ca3af', fontStyle: 'italic' }}>
                     Start typing to see preview...
