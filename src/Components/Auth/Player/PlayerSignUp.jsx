@@ -5,7 +5,15 @@ import { IoChevronBack, IoCloudUploadOutline, IoCalendarOutline } from 'react-ic
 import {useNavigate} from 'react-router-dom';
 
 
+import { PlayerContext } from '../../../Contexts/PlayerContext/PlayerContext';
+import { useContext } from 'react';
+import { toast } from 'react-toastify';
+
+
+
 const PlayerSignUp = () => {
+
+  const { backend_URL, isPlayerLoggedIn, setIsPlayerLoggedIn, playerData,setPlayerData, playerMail,setPlayerMail, getAuthStatusPlayer } = useContext(PlayerContext);
 
   const navigate = useNavigate();
 
@@ -18,6 +26,7 @@ const PlayerSignUp = () => {
     dateOfBirth: '',
     aadhaarCard: null
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedFileName, setUploadedFileName] = useState('');
 
@@ -40,17 +49,91 @@ const PlayerSignUp = () => {
     }
   };
 
+
+  const handleAadhaar = (evt)=>{
+
+    const image = evt.target.files[0];
+
+    if(!image){
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(image);
+
+    reader.onload = async ()=>{
+      const base64Image = reader.result;
+      // setEditDetails((prev)=>{
+      //   return {...prev, profilePic: base64Image};
+      // })
+      // setFormData(prev => ({
+      //   ...prev,
+      //   coverImage: base64Image
+      // }));
+
+      setFormData(prev => ({
+        ...prev,
+        aadhaarCard: base64Image
+      }));
+
+    }
+
+
+  }
+
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.fullName.trim() || !formData.email.trim() || !formData.password.trim()) return;
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.password.trim() || !formData.phoneNumber || !formData.dateOfBirth || !formData.aadhaarCard) return;
 
-    setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Player registration:', formData);
+    // // Simulate API call
+    // setTimeout(() => {
+      //   console.log('Player registration:', formData);
+      //   setIsSubmitting(false);
+      // }, 1500);
+      
+      // console.log(formData);
+      
+      try{
+
+      setIsSubmitting(true);
+      
+      const fetchOptions = {
+            method:"POST",
+            credentials:"include",
+            headers:{
+              "Content-Type":"application/json"
+            },
+            body:JSON.stringify(formData)
+      }
+      
+      const response = await fetch(`${backend_URL}/api/player/signup`,fetchOptions);
+      const data = await response.json();
+      if(data.success){
+        toast.success(data.message);
+        setPlayerMail(formData.email);
+        navigate('/otp/player');
+      }else{
+        console.log(data);
+        toast.error(data.message);
+        setIsPlayerLoggedIn(false);
+      }
+
+
+    }catch(error){
+      console.log(`Error in SignUp Handler (Player) ${error}`);
+      toast.error(`Error In Sign Up Handler ${error}`);
+    }finally{
       setIsSubmitting(false);
-    }, 1500);
+    }
+
+
+
+
   };
 
 
@@ -169,15 +252,17 @@ const PlayerSignUp = () => {
                   type="file"
                   id="aadhaarCard"
                   name="aadhaarCard"
-                  onChange={handleFileUpload}
+                  onChange={handleAadhaar}
                   className="player-reg-file-input"
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
                 <label htmlFor="aadhaarCard" className="player-reg-file-upload-label">
                   <IoCloudUploadOutline className="player-reg-upload-icon" />
-                  <span className="player-reg-upload-text">
-                    {uploadedFileName || 'Upload Aadhaar Card'}
-                  </span>
+                  {
+                    formData.aadhaarCard? 
+                    <img src={formData?.aadhaarCard} className="player-reg-upload-text" />:
+                    <span className='player-reg-upload-text'>  Upload Aadhaar Card </span>
+                  }
                 </label>
               </div>
             </div>

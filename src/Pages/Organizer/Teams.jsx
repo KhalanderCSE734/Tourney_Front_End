@@ -175,7 +175,7 @@ const Teams = () => {
                 <th className="teams-th teams-th-email">Email</th>
                 <th className="teams-th teams-th-mobile">Mobile</th>
                 <th className="teams-th teams-th-academy">Academy Name</th>
-                <th className="teams-th teams-th-actions">Actions</th>
+                {/* <th className="teams-th teams-th-actions">Actions</th> */}
               </tr>
             </thead>
             <tbody className="teams-table-body">
@@ -211,7 +211,7 @@ const Teams = () => {
                       <span className="teams-academy-text">{team.academyName}</span>
                     </div>
                   </td>
-                  <td className="teams-td teams-td-actions">
+                  {/* <td className="teams-td teams-td-actions">
                     <div className="teams-action-buttons">
                       <button 
                         className="teams-action-btn teams-view-btn"
@@ -232,7 +232,7 @@ const Teams = () => {
                         <IoTrashOutline />
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

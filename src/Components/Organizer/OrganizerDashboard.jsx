@@ -5,6 +5,18 @@ import './CSS/OrganizerDashboard.css';
 import { IoPersonCircleOutline, IoEllipsisVertical, IoCheckmarkCircle, IoClose, IoChevronForward, IoAdd, IoBusinessOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 
+
+
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+
+import { useContext } from 'react';
+
+
+
+
+
+
 // SVG Icon Components (existing)
 const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>;
 const TrophyIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V22h4v-7.34"/><path d="M12 9.5L14.5 2H9.5L12 9.5z"/><path d="M7 14h10"/></svg>;
@@ -21,6 +33,10 @@ const SwitchIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" heig
 const BillingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>;
 
 const OrganizerDashboard = ({ toggleSidebar }) => {
+  
+
+  
+  
   // NEW: State to manage the active organization tab
   const [activeOrgTab, setActiveOrgTab] = useState('My organization');
 
@@ -35,6 +51,10 @@ const OrganizerDashboard = ({ toggleSidebar }) => {
     { name: 'Switch organization', icon: <SwitchIcon /> },
     { name: 'Billings', icon: <BillingsIcon /> },
   ];
+
+
+  
+
 
 
 
@@ -132,7 +152,11 @@ const StatCard = ({ title, value, icon, iconClass }) => (
 
 const OrganizationHome = ()=>{
 
-
+  
+  const { organizerData } = useContext(OrganizerContext);
+  
+  // console.log(organizerData);
+  
   
 
   const [formData, setFormData] = useState({
@@ -142,13 +166,13 @@ const OrganizationHome = ()=>{
     country: 'IN'
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     [name]: value
+  //   }));
+  // };
 
 
 
@@ -166,7 +190,7 @@ const OrganizationHome = ()=>{
           <label htmlFor="organizationName" className="form-label">
             ORGANIZATION NAME <span className="required">*</span>
           </label>
-          <input
+          {/* <input
             type="text"
             id="organizationName"
             name="organizationName"
@@ -174,14 +198,17 @@ const OrganizationHome = ()=>{
             onChange={handleInputChange}
             className="form-input"
             placeholder="Enter organization name"
-          />
+          /> */}
+          <div className='form-input'>
+            {organizerData? organizerData.fullName : "Mohammed Khalander"}
+          </div>
         </div>
 
         <div className="form-group">
           <label htmlFor="email" className="form-label">
             EMAIL <span className="required">*</span>
           </label>
-          <input
+          {/* <input
             type="email"
             id="email"
             name="email"
@@ -189,7 +216,10 @@ const OrganizationHome = ()=>{
             onChange={handleInputChange}
             className="form-input"
             placeholder="Enter email address"
-          />
+          /> */}
+          <div className='form-input'>
+            {organizerData? organizerData.email: "khalandermohmmed734@gmail.com" }
+          </div>          
         </div>
 
         <div className="form-group">
@@ -197,7 +227,7 @@ const OrganizationHome = ()=>{
             MOBILE <span className="required">*</span>
             <span className="helper-text">(without country code)</span>
           </label>
-          <input
+          {/* <input
             type="tel"
             id="mobile"
             name="mobile"
@@ -205,14 +235,17 @@ const OrganizationHome = ()=>{
             onChange={handleInputChange}
             className="form-input"
             placeholder="Enter mobile number"
-          />
+          /> */}
+          <div className='form-input'>
+            {organizerData? organizerData.phone: "7349696566" }
+          </div>           
         </div>
 
         <div className="form-group">
           <label htmlFor="country" className="form-label">
             COUNTRY
           </label>
-          <select
+          {/* <select
             id="country"
             name="country"
             value={formData.country}
@@ -224,17 +257,21 @@ const OrganizationHome = ()=>{
             <option value="UK">United Kingdom (UK)</option>
             <option value="AU">Australia (AU)</option>
             <option value="CA">Canada (CA)</option>
-          </select>
+          </select> */}
+          <div className='form-input'>
+            India (IN)
+          </div>           
+
         </div>
 
-        <div className="form-actions">
+        {/* <div className="form-actions">
           <button type="button" className="btn-secondary">
             Cancel
           </button>
           <button type="submit" className="btn-primary">
             Save Organization Details
           </button>
-        </div>
+        </div> */}
       </form>
     </div>
       </>

@@ -4,7 +4,15 @@ import { Link } from "react-router-dom";
 
 import Navigation from "./Navigation";
 
+import { useNavigate } from 'react-router-dom';
+
 const HeroSection = () => {
+
+
+  const navigate = useNavigate();
+
+
+
   return (
 
     
@@ -39,7 +47,7 @@ const HeroSection = () => {
           <div className="space-y-4">
             <p className="text-lg md:text-xl text-white/80">
               Want To Organize Your Own Events? 
-              <span className="text-red-500 ml-2 font-semibold">Click Here →</span>
+              <span className="text-red-500 ml-2 font-semibold cursor-pointer" onClick={()=>{navigate('/signup/organizer')}}>Click Here →</span>
             </p>
             
             {/* Action Buttons */}

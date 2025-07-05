@@ -1,14 +1,70 @@
 import { Search, MapPin, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 // import { useAuth } from "@/contexts/AuthContext";
+
+
+import { toast } from "react-toastify";
+
+
+import { OrganizerContext } from "../Contexts/OrganizerContext/OrganizerContext";
+import { useContext } from "react";
+
+
+import { PlayerContext } from "../Contexts/PlayerContext/PlayerContext";
+
+
+
 
 const Navigation = () => {
 
+  const { isOrganizerLoggedIn, backend_URL, setOrganizerData, setIsOrganizerLoggedIn, getAuthStatusOrganizer } = useContext(OrganizerContext);
 
-      const location = useLocation();
-      const isHomePage = location.pathname === "/";
+  const { isPlayerLoggedIn, setIsPlayerLoggedIn, playerData,setPlayerData, playerMail,setPlayerMail, getAuthStatusPlayer } = useContext(PlayerContext);
+
+
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
+  const navigate = useNavigate();
+
+  console.log(isPlayerLoggedIn,playerData);
+
+
+  const handleLogOut = async(evt)=>{
+    try{
+          const fetchOptions = {
+            method:"POST",
+            credentials:"include",
+          }
+
+          const response = await fetch(`${backend_URL}/api/player/logout`,fetchOptions);
+          const data = await response.json();
+
+          if(data.success){
+            toast.success(data.message);
+            setIsPlayerLoggedIn(false);
+            setPlayerData(false);
+            getAuthStatusPlayer();
+            navigate('/');
+            console.log("Player Logged Out Successfully");
+          }else{
+            console.log("Error In LogOut Route Frontend Player",data.message);
+            toast.error(data.message);
+          }
+
+        }catch(error){
+          console.log("Error In LogOut Route Frontend Player",error);
+          toast.error(`Error In LogOut Route Player Side ${error}`);
+        }
+  }
+
+
+
+
+
+
 
 
   return (
@@ -67,9 +123,21 @@ const Navigation = () => {
               </div>
             ) : ( */}
 
-              <Link to="/roleSelection">
-                <Button className="bg-red-500 hover:bg-primary/90 text-white cursor-pointer">Login</Button>
-              </Link>
+
+            {
+              isPlayerLoggedIn?
+              <div>
+                   <Button className="bg-red-500 hover:bg-primary/90 text-white cursor-pointer" onClick={()=>{ handleLogOut() }}>Log Out</Button>
+                </div> :
+                <Link to="/roleSelection">
+                   <Button className="bg-red-500 hover:bg-primary/90 text-white cursor-pointer">Login</Button>
+                </Link> 
+            }
+           
+                
+             
+
+              
 
             {/* )} */}
 

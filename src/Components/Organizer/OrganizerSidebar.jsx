@@ -4,9 +4,23 @@ import './CSS/OrganizerSidebar.css';
 import { Link,NavLink, useNavigate } from 'react-router-dom';
 
 
-import OrganizerContextProvider from '../../Contexts/OrganizerContext/OrganizerContext';
+import { FaArrowLeft } from "react-icons/fa6";
+
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
 
 import { useContext } from 'react';
+
+
+
+
+import { toast } from 'react-toastify';
+
+
+
+
+
+
 
 
 // SVG Icon Components
@@ -20,6 +34,49 @@ const OrganizerIcon = () => <div style={{width: '24px', height: '24px', borderRa
 
 
 const OrganizerSidebar = ({ isOpen, toggleSidebar }) => {
+
+
+  const navigate = useNavigate();
+
+
+
+  const { isOrganizerLoggedIn, backend_URL, setOrganizerData, setIsOrganizerLoggedIn, getAuthStatusOrganizer } = useContext(OrganizerContext);
+
+
+
+
+    const handleLogOut = async(evt)=>{
+      try{
+            const fetchOptions = {
+              method:"POST",
+              credentials:"include",
+            }
+  
+            const response = await fetch(`${backend_URL}/api/organizer/logout`,fetchOptions);
+            const data = await response.json();
+  
+            if(data.success){
+              toast.success(data.message);
+              setIsOrganizerLoggedIn(false);
+              setOrganizerData(false);
+              getAuthStatusOrganizer();
+              navigate('/');
+              // console.log("Organizer Logged Out Successfully");
+            }else{
+              console.log("Error In LogOut Route Frontend",data.message);
+              toast.error(data.message);
+            }
+  
+          }catch(error){
+            console.log("Error In LogOut Route Frontend",error);
+            toast.error(`Error In LogOut Route ${error}`);
+          }
+    }
+
+
+
+
+
   return (
     <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div>
@@ -57,15 +114,15 @@ const OrganizerSidebar = ({ isOpen, toggleSidebar }) => {
           </ul>
         </nav>
       </div>
-      {/* <div className="user-profile">
+      <div className="user-profile cursor-pointer" onClick={()=>{ handleLogOut() }}>
         <div className="avatar">
-          <UserIcon />
+          <FaArrowLeft />
         </div>
-        <div className="user-info">
-          <p className="name">John Organizer</p>
-          <p className="email">john@example.com</p>
+        <div className="user-info" >
+          <p className="name">Log Out</p>
+          {/* <p className="email">john@example.com</p> */}
         </div>
-      </div> */}
+      </div>
     </aside>
   );
 };

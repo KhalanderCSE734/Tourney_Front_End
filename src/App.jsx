@@ -17,23 +17,43 @@ import CreateTournament from './Pages/Organizer/CreateTournament';
 import Tournament from './Pages/Organizer/Tournament';
 import Events from './Pages/Organizer/Events';
 
-  import { ToastContainer, Bounce } from 'react-toastify';
+import { ToastContainer, Bounce } from 'react-toastify';
 
 
 
 
 import PlayerLogin from './Components/Auth/Player/PlayerLogin';
 import PlayerSignUp from './Components/Auth/Player/PlayerSignUp';
+import OtpPlayer from './Pages/Player/OtpPlayer';
 import OrganizerLogin from './Components/Auth/Organizer/OrganizerLogin';
 import OrganizerSignUp from './Components/Auth/Organizer/OrganizerSignUp';
+import OTP from './Pages/Organizer/OTP';
+
 import AdminLogin from './Components/Auth/Admin/AdminLogin';
 import Layout from './Components/Admin/components/layout/Layout';
 import DashboardPage from './Components/Admin/pages/dashboard/index';
 
 
+import { OrganizerContext } from './Contexts/OrganizerContext/OrganizerContext'
+import { useContext, useEffect } from 'react';
+
+import { PlayerContext } from './Contexts/PlayerContext/PlayerContext';
+
 
 
 const App = () => {
+
+
+  const { getAuthStatusOrganizer } = useContext(OrganizerContext);
+
+  const { getAuthStatusPlayer } = useContext(PlayerContext);
+
+  useEffect(()=>{ 
+    getAuthStatusOrganizer();
+    getAuthStatusPlayer();
+  },[]);
+
+
   return (
     <div>
       <Routes>
@@ -54,10 +74,12 @@ const App = () => {
         {/* Player Routes */}
         <Route path='/login/player' element={<PlayerLogin/>}/>
         <Route path='/signup/player' element={<PlayerSignUp/>}/>
+        <Route path='/otp/player' element={<OtpPlayer/>}/>
 
         {/* Organizer Routes */}
         <Route path='/login/organizer' element={<OrganizerLogin/>}/>
         <Route path='/signup/organizer' element={<OrganizerSignUp/>}/>
+        <Route path='/otp/organizer' element={<OTP/>}/>
 
         {/* Admin Routes */}
         <Route path='/login/admin' element={<AdminLogin/>}/>

@@ -7,10 +7,18 @@ import { IoChevronBack, IoLogoGoogle } from 'react-icons/io5';
 
 import {useNavigate} from 'react-router-dom';
 
+import { OrganizerContext } from '../../../Contexts/OrganizerContext/OrganizerContext';
+import { useContext } from 'react';
+import { toast } from 'react-toastify';
+
 
 const OrganizerLogin = () => {
 
+  const { backend_URL, getAuthStatusOrganizer, setIsOrganizerLoggedIn,   } = useContext(OrganizerContext);
+
   const navigate = useNavigate();
+
+
 
   
   const [formData, setFormData] = useState({
@@ -31,13 +39,46 @@ const OrganizerLogin = () => {
     e.preventDefault();
     if (!formData.email.trim() || !formData.password.trim()) return;
 
-    setIsSubmitting(true);
+    // setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Player login:', formData);
+    // // Simulate API call
+    // setTimeout(() => {
+    //   console.log('Player login:', formData);
+    //   setIsSubmitting(false);
+    // }, 1500);
+
+    try{
+      setIsSubmitting(true);
+      const fetchOptions = {
+        method:"POST",
+        credentials:"include",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(formData)
+      }
+
+      const response = await fetch(`${backend_URL}/api/organizer/login`,fetchOptions);
+      const data = await response.json();
+      if(data.success){
+        toast.success(data.message);
+        getAuthStatusOrganizer();
+        setIsOrganizerLoggedIn(true);
+        navigate('/organizer/home');
+      }else{
+        console.log(data);
+        toast.error(data.message);
+        setIsOrganizerLoggedIn(false);
+      }
+    }catch(error){
+      console.log("Error in Organizer Login",error);
+      toast.error(`Error in organizer Login ${error}`);
+    }finally{
       setIsSubmitting(false);
-    }, 1500);
+    }
+
+
+
   };
 
   const handleGoogleLogin = () => {

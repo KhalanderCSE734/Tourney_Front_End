@@ -1,18 +1,36 @@
 import React, { useState } from 'react';
 import '../CSS/OrganizerSignUp.css';
+
+
+
 import { IoChevronBack, IoLogoGoogle } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+
 
 import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+
+
+
+
+import { OrganizerContext } from '../../../Contexts/OrganizerContext/OrganizerContext';
+
+
+
 
 const OrganizerSignUp = () => {
 
   const navigate = useNavigate();
 
+  const { backend_URL ,setOrganizerMail, setIsOrganizerLoggedIn } = useContext(OrganizerContext);
+
 
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    password: ''
+    password: '',
+    organizationName:'',
+    phone:'',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,15 +44,41 @@ const OrganizerSignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.fullName.trim() || !formData.email.trim() || !formData.password.trim()) return;
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.password.trim() || !formData.organizationName.trim() || !formData.phone.trim()) return;
 
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Organizer registration:', formData);
+    try{
+      setIsSubmitting(true);
+      const fetchOptions = {
+        method:"POST",
+        credentials:"include",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(formData)
+      }
+
+      const response = await fetch(`${backend_URL}/api/organizer/signup`,fetchOptions);
+      const data = await response.json();
+      if(data.success){
+        toast.success(data.message);
+        setOrganizerMail(formData.email);
+        navigate('/otp/organizer');
+      }else{
+        console.log(data);
+        toast.error(data.message);
+        setIsOrganizerLoggedIn(false);
+      }
+    }catch(error){
+        console.log("Error in Front-End Sign Up Handler ", error);
+        toast.error(error);
+    }finally{
       setIsSubmitting(false);
-    }, 1500);
+    }
+
+    setFormData({ fullName:"", email:"", password:"" , organizationName:"",phone:"" });
+
+
+
   };
 
   const handleGoogleSignUp = () => {
@@ -46,7 +90,9 @@ const OrganizerSignUp = () => {
   const isFormValid = () => {
     return formData.fullName.trim() && 
            formData.email.trim() && 
-           formData.password.trim();
+           formData.password.trim() &&
+           formData.organizationName.trim() &&
+           formData.phone.trim() ;
   };
 
   return (
@@ -65,7 +111,7 @@ const OrganizerSignUp = () => {
           <form onSubmit={handleSubmit} className="organizer-signup-form">
             <div className="organizer-signup-form-group">
               <label htmlFor="organizerFullName" className="organizer-signup-form-label">
-                Full Name
+                Organizer Name
               </label>
               <input
                 type="text"
@@ -75,6 +121,22 @@ const OrganizerSignUp = () => {
                 onChange={handleInputChange}
                 className="organizer-signup-form-input"
                 placeholder="Enter your full name"
+                required
+              />
+            </div>
+
+            <div className="organizer-signup-form-group">
+              <label htmlFor="organizationName" className="organizer-signup-form-label">
+                Organization Name
+              </label>
+              <input
+                type="text"
+                id="organizationName"
+                name="organizationName"
+                value={formData.organizationName}
+                onChange={handleInputChange}
+                className="organizer-signup-form-input"
+                placeholder="Enter Organization name"
                 required
               />
             </div>
@@ -91,6 +153,22 @@ const OrganizerSignUp = () => {
                 onChange={handleInputChange}
                 className="organizer-signup-form-input"
                 placeholder="Enter your email"
+                required
+              />
+            </div>
+
+            <div className="organizer-signup-form-group">
+              <label htmlFor="phone" className="organizer-signup-form-label">
+                Phone Number
+              </label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="organizer-signup-form-input"
+                placeholder="Enter Organizer Phone Number"
                 required
               />
             </div>

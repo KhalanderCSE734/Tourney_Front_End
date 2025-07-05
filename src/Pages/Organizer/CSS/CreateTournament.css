@@ -343,6 +343,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  padding-left:10px;
+  padding-top:10px;
 }
 
 .create-tournament-editor-label-full {
@@ -598,7 +600,7 @@
 /* Details actions */
 .create-tournament-details-actions {
   margin-top: 32px;
-  padding-top: 24px;
+  padding: 24px;
   border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;

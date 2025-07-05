@@ -13,6 +13,13 @@ import L from 'leaflet';
 import { toast } from 'react-toastify';
 
 
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+import { useContext } from 'react';
+
+
+
+
 // Fix for default markers in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -441,6 +448,16 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
   const [selectedText, setSelectedText] = useState('');
   const textareaRef = useRef(null);
 
+
+
+  const { backend_URL,  } = useContext(OrganizerContext);
+
+  const navigate = useNavigate();
+
+
+
+  const [isSubmitting,setIsSubmitting] = useState(false);
+
   // const handlePosterUpload = (e) => {
   //   const file = e.target.files[0];
   //   if (file) {
@@ -455,17 +472,39 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
     }));
   }
 
-  const handleSave = () => {
-
-
+  const handleSave = async() => {
+    console.log(formData);
+    try{
+          setIsSubmitting(true);
+          const fetchOptions = {
+            method:"POST",
+            credentials:"include",
+            headers:{
+              "Content-Type":"application/json"
+            },
+            body:JSON.stringify(formData)
+          }
     
-    console.log('Tournament details saved',formData);
-
-
-
+          const response = await fetch(`${backend_URL}/api/organizer/createTournament`,fetchOptions);
+          const data = await response.json();
+          if(data.success){
+            toast.success(data.message);
+            navigate('/organizer/tournaments');
+          }else{
+            console.log(data);
+            toast.error(data.message);
+          }
+        }catch(error){
+            console.log("Error in Front-End Create Tournament Handler ", error);
+            toast.error(error);
+        }finally{
+          setIsSubmitting(false);
+        }
 
 
   };
+
+
 
   // Get selected text from textarea
   const getSelectedText = () => {
@@ -761,8 +800,10 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
                   type="button" 
                   className="create-tournament-btn-full create-tournament-btn-primary-full"
                   onClick={handleSave}
+                  disabled={isSubmitting}
                 >
-                  Save Tournament Details
+                  {isSubmitting ? 'Saving Details.....' : 'Save Tournament Details'}
+                  {/* Save Tournament Details */}
                 </button>
               </div>
             </div>

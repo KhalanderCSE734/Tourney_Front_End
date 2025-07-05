@@ -165,7 +165,7 @@ const Events = () => {
                 <th className="events-th events-th-match">Match Type</th>
                 <th className="events-th events-th-team">Maximum Team</th>
                 <th className="events-th events-th-booking">Allow Booking</th>
-                <th className="events-th events-th-actions">Actions</th>
+                {/* <th className="events-th events-th-actions">Actions</th> */}
               </tr>
             </thead>
             <tbody className="events-table-body">
@@ -191,7 +191,7 @@ const Events = () => {
                       {event.allowBooking}
                     </span>
                   </td>
-                  <td className="events-td events-td-actions">
+                  {/* <td className="events-td events-td-actions">
                     <div className="events-action-buttons">
                       <button 
                         className="events-action-btn events-view-btn"
@@ -215,7 +215,7 @@ const Events = () => {
                         <IoTrashOutline />
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
