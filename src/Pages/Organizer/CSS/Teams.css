@@ -1051,3 +1051,179 @@
 .teams-modal-container::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+
+/* ...use your existing CSS from your previous message... */
+
+/* Additional for group/team modal */
+.teams-group-team-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 18px 12px 18px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.teams-group-team-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.teams-remove-team-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.teams-remove-team-btn:hover {
+  background: #fecaca;
+}
+.teams-group-member-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  position: relative;
+}
+.teams-fees-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.teams-add-team-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: #3b82f6;
+  border: 2px dashed #3b82f6;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 18px;
+  margin: 18px 0 0 0;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+}
+.teams-add-team-btn:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
+}
+.teams-members-list-table {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.teams-members-list-table li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.teams-member-icon {
+  color: #3b82f6;
+  font-size: 14px;
+}
+.teams-member-details {
+  color: #64748b;
+  font-size: 12px;
+  margin-left: 4px;
+}
+.teams-fees-paid-icon {
+  color: #10b981;
+  font-size: 16px;
+  margin-left: 4px;
+}
+
+/* Responsive tweaks for group/team modal */
+@media (max-width: 900px) {
+  .teams-group-member-row {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+}
+
+
+.team-members-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.team-member-card {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  min-width: 200px;
+  max-width: 240px;
+  flex: 1 1 200px;
+  padding: 16px 14px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  box-shadow: 0 2px 10px 0 rgba(59,130,246,0.03);
+  transition: box-shadow 0.18s;
+}
+
+.team-member-card:hover {
+  box-shadow: 0 6px 24px 0 rgba(59,130,246,0.13);
+  border-color: #b6cdfc;
+}
+
+.team-member-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.team-member-name {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.team-member-fees-paid {
+  color: #10b981;
+  font-size: 1.2em;
+}
+
+.team-member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.97rem;
+  color: #475569;
+}
+
+.team-member-info-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 0.97rem;
+  word-break: break-all;
+}
+
+@media (max-width: 900px) {
+  .team-members-grid {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .team-member-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+}

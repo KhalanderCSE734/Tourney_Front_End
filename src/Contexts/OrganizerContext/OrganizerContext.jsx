@@ -29,6 +29,11 @@ const OrganizerContextProvider = (props)=>{
     const [organizerMail,setOrganizerMail] = useState("");
 
 
+
+
+    const [tournament,setTournament] = useState(null);
+
+
     const navigate = useNavigate();
 
 
@@ -63,9 +68,6 @@ const OrganizerContextProvider = (props)=>{
 
     }
 
-
-
-
     const getAuthStatusOrganizer = async(evt)=>{
         try{
             const fetchOptions = {
@@ -90,6 +92,33 @@ const OrganizerContextProvider = (props)=>{
     }
 
 
+    
+      const fetchTournamentDetails = async (id)=>{
+        try{
+          const fetchOptions = {
+            method:"GET",
+            credentials:"include",
+          }
+    
+          const response = await fetch(`${backend_URL}/api/organizer/getParticularTournament/${id}`,fetchOptions);
+          const data = await response.json();
+    
+          if(data.success){
+            console.log(data);
+            setTournament(data.message);
+    
+          }else{
+            toast.error(`Error In Fetching Tournaments ${data.message}`);
+          }
+          
+          
+        }catch(error){
+          console.log("Error in Fetching Tournament Details Front-end",error);
+          toast.error(`Error in Fetching Tournament Details ${error}`);
+        }
+      }
+    
+
 
     
 
@@ -102,6 +131,7 @@ const OrganizerContextProvider = (props)=>{
         organizerData,setOrganizerData,
         organizerMail,setOrganizerMail,
         getAuthStatusOrganizer, 
+        fetchTournamentDetails, tournament
     };
     
     

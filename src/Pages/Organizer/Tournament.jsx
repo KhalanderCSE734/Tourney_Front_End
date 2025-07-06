@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './CSS/Tournament.css';
 import { IoCalendarOutline, IoLocationOutline, IoPeopleOutline, IoTrophyOutline, IoTimeOutline, IoShareOutline, IoBookmarkOutline, IoStatsChartOutline } from 'react-icons/io5';
 
@@ -11,7 +11,25 @@ import Settings from './Settings';
 import Fixtures from './Fixtures';
 
 
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+
+import { useState, useEffect, useContext } from 'react';
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+
+
+import { marked } from 'marked';
+
+
+
 const Tournament = () => {
+
+
+  const { backend_URL, fetchTournamentDetails, tournament } = useContext(OrganizerContext);
+
+
   const [activeTab, setActiveTab] = useState('basic-info');
 
   // Mock tournament data
@@ -71,6 +89,42 @@ const Tournament = () => {
     { label: 'Revenue', value: tournamentData.revenue, icon: <IoTrophyOutline />, color: '#f59e0b' }
   ];
 
+
+  const { id } = useParams();
+
+
+  
+
+
+  useEffect(()=>{ 
+    fetchTournamentDetails(id);
+  },[]);
+
+/**
+ * coverImage: "https://res.cloudinary.com/dsk16aew0/image/upload/v1751658334/caf7zt0hhcgutzwwuf9x.png"
+createdAt: "2025-07-04T19:45:34.895Z"
+description: "The Description is Very **Important**\n\n<u>Because It is description</u>\n\n# This is Created By ByteDocker\n\n1. Canvas is Working Properly \n• Hopefully It should Work on ~~Tournament~~ *Description*"
+endDate: "2025-08-07T00:00:00.000Z"
+events: []
+isVerified: false
+location: "Mangalore"
+name: "Badminton"
+organization: "68681de33959317d43433dce"
+settings: {url: null, otp: '983620', seedingOptionInFixtures: false, askEmailFromPlayer: true, askMobileFromPlayer: true, …}
+sport: "Badminton"
+startDate: "2025-07-19T00:00:00.000Z"
+status: "Upcoming"
+teams: []
+type: "Public"
+updatedAt: "2025-07-04T19:45:34.895Z"
+__v : 0
+_id : "68682f5e643f91a48cb952b1"
+ */
+
+
+
+
+
   return (
     <div className="tournament-page-container">
       {/* Header Section */}
@@ -78,45 +132,47 @@ const Tournament = () => {
         <div className="tournament-header-content">
           <div className="tournament-title-area">
             <div className="tournament-badges">
-              {tournamentData.isPublic && (
-                <span className="tournament-badge tournament-badge-public">PUBLIC</span>
-              )}
-              {tournamentData.isVerified && (
+              
+                <span className="tournament-badge tournament-badge-public"> { tournament?.type } </span>
+                
+              {tournament?.isVerified ? (
                 <span className="tournament-badge tournament-badge-verified">Verified</span>
-              )}
+              ):
+                <span className="tournament-badge tournament-badge-verified">Not Verified</span>
+            }
             </div>
-            <h1 className="tournament-main-title">{tournamentData.name}</h1>
+            <h1 className="tournament-main-title">{tournament?.name}</h1>
             <div className="tournament-status-indicator">
-              <span className={`tournament-status tournament-status-${tournamentData.status.toLowerCase()}`}>
-                {tournamentData.status}
+              <span className={`tournament-status tournament-status-${tournament?.status.toLowerCase()}`}>
+                {tournament?.status}
               </span>
             </div>
           </div>
-          
-          <div className="tournament-action-buttons">
+            
+          {/* <div className="tournament-action-buttons">
             <button className="tournament-action-btn tournament-edit-btn">
               Edit Tournament
             </button>
             <button className="tournament-action-btn tournament-add-event-btn">
               + Add Event
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Tournament Quick Info */}
         <div className="tournament-quick-info">
           <div className="tournament-info-item">
             <IoCalendarOutline className="tournament-info-icon" />
-            <span>{tournamentData.startDate} - {tournamentData.endDate}</span>
+            <span> { new Date(tournament?.startDate).toLocaleDateString() } - { new Date(tournament?.endDate).toLocaleDateString() }  </span>
           </div>
           <div className="tournament-info-item">
             <IoLocationOutline className="tournament-info-icon" />
-            <span>{tournamentData.location}</span>
+            <span>{tournament?.location}</span>
           </div>
-          <div className="tournament-info-item">
+          {/* <div className="tournament-info-item">
             <IoPeopleOutline className="tournament-info-icon" />
             <span>{tournamentData.participants.current}/{tournamentData.participants.max} participants</span>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -165,7 +221,7 @@ const Tournament = () => {
                   
                   <div className="tournament-detail-item">
                     <label className="tournament-detail-label">Tournament Name</label>
-                    <div className="tournament-detail-value">{tournamentData.name}</div>
+                    <div className="tournament-detail-value">{tournament?.name}</div>
                   </div>
 
                   <div className="tournament-detail-row">
@@ -173,14 +229,16 @@ const Tournament = () => {
                       <label className="tournament-detail-label">Start Date</label>
                       <div className="tournament-detail-value">
                         <IoCalendarOutline className="tournament-detail-icon" />
-                        {tournamentData.startDate} {tournamentData.startTime}
+                        { new Date(tournament?.startDate).toLocaleDateString() }
+                        {/* {tournamentData.startTime} */}
                       </div>
                     </div>
                     <div className="tournament-detail-item">
                       <label className="tournament-detail-label">End Date</label>
                       <div className="tournament-detail-value">
                         <IoCalendarOutline className="tournament-detail-icon" />
-                        {tournamentData.endDate} {tournamentData.endTime}
+                        { new Date(tournament?.endDate).toLocaleDateString() }
+                        {/* {tournamentData.endTime} */}
                       </div>
                     </div>
                   </div>
@@ -189,7 +247,7 @@ const Tournament = () => {
                     <label className="tournament-detail-label">Venue</label>
                     <div className="tournament-detail-value">
                       <IoLocationOutline className="tournament-detail-icon" />
-                      {tournamentData.venue}
+                      {tournament?.location}
                     </div>
                   </div>
                 </div>
@@ -199,7 +257,7 @@ const Tournament = () => {
                   <h3 className="tournament-section-title">Tournament Poster</h3>
                   <div className="tournament-poster-container">
                     <img 
-                      src={tournamentData.poster} 
+                      src={tournament?.coverImage} 
                       alt="Tournament Poster"
                       className="tournament-poster-image"
                     />
@@ -212,7 +270,7 @@ const Tournament = () => {
                 <h2 className="tournament-section-title">Tournament Description</h2>
                 <div 
                   className="tournament-description-content"
-                  dangerouslySetInnerHTML={{ __html: tournamentData.description }}
+                  dangerouslySetInnerHTML={{ __html: marked(tournament?.description || '') }}
                 />
               </div>
             </div>

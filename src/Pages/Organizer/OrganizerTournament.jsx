@@ -6,12 +6,14 @@ import OrganizerSidebar from '../../Components/Organizer/OrganizerSidebar';
 
 import { IoAdd, IoSearchOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoCalendarOutline, IoLocationOutline, IoPeopleOutline, IoMenuOutline } from 'react-icons/io5';
 
+import { IoLocation } from "react-icons/io5";
 
 
 import {OrganizerContext} from '../../Contexts/OrganizerContext/OrganizerContext';
 
 import { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 
 
@@ -19,30 +21,34 @@ const OrganizerTournament = () => {
 
   const navigate = useNavigate();
   
-  const { isSidebarOpen, setSidebarOpen, toggleSidebar } = useContext(OrganizerContext);
+  const { isSidebarOpen, setSidebarOpen, toggleSidebar, backend_URL } = useContext(OrganizerContext);
   
 
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+
+  const [loading,setLoading] = useState(false);
   
 
   const menu = useRef(null);
   useEffect(()=>{ 
     if(isSidebarOpen){
-      if(menu){
+      if(menu && menu.current && menu.current.style){
         menu.current.style.left = '200px';
       }
     }else{
-      if(menu){
+      if(menu && menu.current && menu.current.style){
         menu.current.style.left = '20px';
       }
     }
   },[isSidebarOpen]);
 
-  const [tournaments] = useState([
+  const [tournaments,setTournaments] = useState([]);
+
+  /**[
     {
-      id: 1,
-      title: 'Summer Badminton Championship 2024',
+      _id: 1,
+      name: 'Summer Badminton Championship 2024',
       sport: 'Badminton',
       status: 'Active',
       dates: '7/15/2024 - 7/20/2024',
@@ -51,8 +57,8 @@ const OrganizerTournament = () => {
       events: '8 events'
     },
     {
-      id: 2,
-      title: 'Inter-College Football Tournament',
+      _id: 2,
+      name: 'Inter-College Football Tournament',
       sport: 'Football',
       status: 'Upcoming',
       dates: '8/10/2024 - 8/15/2024',
@@ -61,8 +67,8 @@ const OrganizerTournament = () => {
       events: '4 events'
     },
     {
-      id: 3,
-      title: 'City Tennis Open',
+      _id: 3,
+      name: 'City Tennis Open',
       sport: 'Tennis',
       status: 'Completed',
       dates: '6/1/2024 - 6/5/2024',
@@ -70,21 +76,15 @@ const OrganizerTournament = () => {
       participants: '48/48 participants',
       events: '6 events'
     }
-  ]);
+  ] */
 
-  const filterOptions = ['All', 'Active', 'Upcoming', 'Completed'];
 
-  const filteredTournaments = tournaments.filter(tournament => {
-    const matchesSearch = tournament.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tournament.sport.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = activeFilter === 'All' || tournament.status === activeFilter;
-    return matchesSearch && matchesFilter;
-  });
 
   
 
   const handleView = (tournamentId) => {
-    console.log('View tournament:', tournamentId);
+    // console.log('View tournament:', tournamentId);
+    navigate(`/organizer/tournament/${tournamentId}`);
   };
 
   const handleEdit = (tournamentId) => {
@@ -107,6 +107,62 @@ const OrganizerTournament = () => {
         return 'organizer-tournament-status-default';
     }
   };
+
+
+  const fetchAllTournaments = async()=>{
+    try{
+
+      const fetchOptions = {
+        method:"GET",
+        credentials:"include",
+      }
+
+      const response = await fetch(`${backend_URL}/api/organizer/getAllTournaments`,fetchOptions);
+      const data = await response.json();
+
+      if(data.success){
+        console.log(data);
+        setTournaments(data.message);
+
+      }else{
+        toast.error(`Error In Fetching Tournaments ${error}`);
+      }
+
+
+    }catch(error){
+      console.log("Error in Fetching Tournaments Front-end",error);
+      toast.error(`Error in Fetching Tournaments ${error}`);
+    }
+  }
+
+
+
+  useEffect(()=>{ 
+    fetchAllTournaments();
+  },[]);
+
+
+
+
+    const filterOptions = ['All', 'Active', 'Upcoming', 'Completed'];
+
+  const filteredTournaments = tournaments.filter(tournament => {
+    const matchesSearch = tournament.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         tournament.sport.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = activeFilter === 'All' || tournament.status === activeFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+
+
+
+
+
+
+
+  if(loading){
+    return <h1 className='text-9xl text-green-700 h-48 align-center pl-80'> Loading.... </h1>
+  }
 
   return (
     <div className="organizer-tournament-layout">
@@ -165,10 +221,10 @@ const OrganizerTournament = () => {
 
           <div className="organizer-tournament-grid">
             {filteredTournaments.map((tournament) => (
-              <div key={tournament.id} className="organizer-tournament-card">
+              <div key={tournament._id} className="organizer-tournament-card">
                 <div className="organizer-tournament-card-header">
                   <div className="organizer-tournament-card-title-section">
-                    <h3 className="organizer-tournament-card-title">{tournament.title}</h3>
+                    <h3 className="organizer-tournament-card-title">{tournament.name}</h3>
                     <div className="organizer-tournament-card-badges">
                       <span className="organizer-tournament-sport-badge">{tournament.sport}</span>
                       <span className={`organizer-tournament-status-badge ${getStatusBadgeClass(tournament.status)}`}>
@@ -181,29 +237,29 @@ const OrganizerTournament = () => {
                 <div className="organizer-tournament-card-details">
                   <div className="organizer-tournament-detail-item">
                     <IoCalendarOutline className="organizer-tournament-detail-icon" />
-                    <span className="organizer-tournament-detail-text">{tournament.dates}</span>
+                    <span className="organizer-tournament-detail-text"> { new Date(tournament.startDate).toLocaleDateString() } - { new Date(tournament.endDate).toLocaleDateString() } </span>
                   </div>
                   <div className="organizer-tournament-detail-item">
-                    <IoLocationOutline className="organizer-tournament-detail-icon" />
+                    {/* <IoLocation className="organizer-tournament-detail-icon" /> */}
                     <span className="organizer-tournament-detail-text">{tournament.location}</span>
                   </div>
-                  <div className="organizer-tournament-detail-item">
+                  {/* <div className="organizer-tournament-detail-item">
                     <IoPeopleOutline className="organizer-tournament-detail-icon" />
                     <span className="organizer-tournament-detail-text">{tournament.participants}</span>
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className="organizer-tournament-card-stats">
+                {/* <div className="organizer-tournament-card-stats">
                   <div className="organizer-tournament-stat-group">
                     <span className="organizer-tournament-stat-label">Events</span>
-                    <span className="organizer-tournament-stat-value">{tournament.events}</span>
+                    <span className="organizer-tournament-stat-value">{tournament.events.length} Events</span>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="organizer-tournament-card-actions">
                   <button 
                     className="organizer-tournament-action-btn organizer-tournament-view-btn"
-                    onClick={() => handleView(tournament.id)}
+                    onClick={() => handleView(tournament._id)}
                   >
                     <IoEyeOutline className="organizer-tournament-action-icon" />
                     View

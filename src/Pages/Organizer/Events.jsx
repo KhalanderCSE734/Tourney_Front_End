@@ -1,8 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './CSS/Events.css';
 import { IoAdd, IoSearchOutline, IoFilterOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoTrophyOutline, IoPeopleOutline, IoClose, IoHelpCircleOutline } from 'react-icons/io5';
 
+import { useParams } from 'react-router-dom';
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+import { useContext } from 'react';
+
+
+import { toast } from 'react-toastify';
+
+
 const Events = () => {
+
+  const { id } = useParams();
+  // console.log(id);
+
+  const { backend_URL } = useContext(OrganizerContext);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortBy, setSortBy] = useState('name');
@@ -18,7 +33,10 @@ const Events = () => {
   });
 
   // Mock events data
-  const [events, setEvents] = useState([
+  const [events, setEvents] = useState();
+
+  /**
+   * [
     { id: 1, name: 'U9 BS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
     { id: 2, name: 'U9 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
     { id: 3, name: 'U11 BS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Inactive' },
@@ -29,14 +47,27 @@ const Events = () => {
     { id: 8, name: 'U15 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
     { id: 9, name: 'U17 BS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
     { id: 10, name: 'U17 GS', eventType: 'singles', fee: 'INR 599', matchType: 'knockout', maxTeam: '-', allowBooking: 'Active' },
-  ]);
+  ]
+   */
 
-  const filteredEvents = events.filter(event => {
-    const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         event.eventType.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || event.allowBooking.toLowerCase() === filterStatus;
+  // const filteredEvents = events?.filter(event => {
+  //   const matchesSearch = event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //                        event.eventType.toLowerCase().includes(searchTerm.toLowerCase());
+  //   const matchesFilter = filterStatus === 'all' || event.allowBooking.toLowerCase() === filterStatus;
+  //   return matchesSearch && matchesFilter;
+  // });
+
+  const filteredEvents = events?.filter(event => {
+    const matchesSearch =
+      event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.eventType.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      filterStatus === 'all' ||
+      (filterStatus === 'active' && event.allowBooking) ||
+      (filterStatus === 'inactive' && !event.allowBooking);
     return matchesSearch && matchesFilter;
   });
+
 
   const handleCreateEvent = () => {
     setShowCreateModal(true);
@@ -63,23 +94,78 @@ const Events = () => {
     }));
   };
 
-  const handleSubmitEvent = (e) => {
+  const handleSubmitEvent = async(e) => {
     e.preventDefault();
     
-    // Create new event
-    const newEvent = {
-      id: events.length + 1,
-      name: newEventData.eventName,
-      eventType: newEventData.eventType,
-      fee: newEventData.teamEntryFee ? `INR ${newEventData.teamEntryFee}` : 'Free',
-      matchType: newEventData.matchType,
-      maxTeam: newEventData.maxTeams || '-',
-      allowBooking: newEventData.allowBooking ? 'Active' : 'Inactive'
-    };
+    try{
 
-    setEvents(prev => [...prev, newEvent]);
+      const fetchOptions = {
+        method:"POST",
+        credentials:"include",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(newEventData)
+      }
+
+      const response = await fetch(`${backend_URL}/api/organizer/createEvent/${id}`,fetchOptions);
+      const data = await response.json();
+      if(data.success){
+        toast.success(data.message);
+      }else{
+        console.log(data);
+        toast.error(data.message);
+      }
+    }catch(error){
+        console.log("Error in Front-End Create Tournament Handler ", error);
+        toast.error(error);
+    } 
+
+
+
     handleCloseModal();
+
   };
+
+
+
+
+
+  const fetchAllEvents = async (req,res)=>{
+
+    try{
+      const fetchOptions = {
+        method:"GET",
+        credentials:"include",
+      }
+
+      const response = await fetch(`${backend_URL}/api/organizer/allEvents/${id}`,fetchOptions);
+      const data = await response.json();
+
+      if(data.success){
+        // toast.success(data.message);
+        console.log(data.message);
+        setEvents(data.message);
+      }else{
+        console.log(data);
+        toast.error(data.message);
+      }
+    }catch(error){
+        console.log("Error in Front-End Create Tournament Handler ", error);
+        toast.error(error);
+    } 
+
+  }
+
+
+
+  useEffect(()=>{ 
+    fetchAllEvents();
+  },[]);
+
+
+
+
 
   const handleViewEvent = (eventId) => {
     console.log('View event:', eventId);
@@ -94,7 +180,7 @@ const Events = () => {
   };
 
   const getStatusBadgeClass = (status) => {
-    return status.toLowerCase() === 'active' ? 'events-status-active' : 'events-status-inactive';
+    return status ? 'events-status-active' : 'events-status-inactive';
   };
 
   return (
@@ -138,7 +224,7 @@ const Events = () => {
             </select>
           </div>
 
-          <div className="events-filter-group">
+          {/* <div className="events-filter-group">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -148,7 +234,8 @@ const Events = () => {
               <option value="fee">Sort by Fee</option>
               <option value="status">Sort by Status</option>
             </select>
-          </div>
+          </div> */}
+
         </div>
       </div>
 
@@ -166,11 +253,11 @@ const Events = () => {
                 <th className="events-th events-th-team">Maximum Team</th>
                 <th className="events-th events-th-booking">Allow Booking</th>
                 {/* <th className="events-th events-th-actions">Actions</th> */}
-              </tr>
+              </tr> 
             </thead>
             <tbody className="events-table-body">
-              {filteredEvents.map((event, index) => (
-                <tr key={event.id} className="events-table-row">
+              {filteredEvents?.map((event, index) => (
+                <tr key={event._id} className="events-table-row">
                   <td className="events-td events-td-sno">{index + 1}</td>
                   <td className="events-td events-td-name">
                     <div className="events-name-cell">
@@ -182,13 +269,13 @@ const Events = () => {
                     <span className="events-type-badge">{event.eventType}</span>
                   </td>
                   <td className="events-td events-td-fee">
-                    <span className="events-fee-text">{event.fee}</span>
+                    <span className="events-fee-text">{event.entryFee}</span>
                   </td>
                   <td className="events-td events-td-match">{event.matchType}</td>
-                  <td className="events-td events-td-team">{event.maxTeam}</td>
+                  <td className="events-td events-td-team">{event.maxTeams}</td>
                   <td className="events-td events-td-booking">
                     <span className={`events-status-badge ${getStatusBadgeClass(event.allowBooking)}`}>
-                      {event.allowBooking}
+                      {event.allowBooking? 'Active' : 'In-Active'}
                     </span>
                   </td>
                   {/* <td className="events-td events-td-actions">
@@ -228,18 +315,18 @@ const Events = () => {
         <div className="events-summary-stats">
           <div className="events-stat-item">
             <span className="events-stat-label">Total Events:</span>
-            <span className="events-stat-value">{events.length}</span>
+            <span className="events-stat-value">{events?.length}</span>
           </div>
           <div className="events-stat-item">
             <span className="events-stat-label">Active Events:</span>
             <span className="events-stat-value events-stat-active">
-              {events.filter(e => e.allowBooking === 'Active').length}
+              {events?.filter(e => e.allowBooking).length}
             </span>
           </div>
           <div className="events-stat-item">
             <span className="events-stat-label">Inactive Events:</span>
             <span className="events-stat-value events-stat-inactive">
-              {events.filter(e => e.allowBooking === 'Inactive').length}
+              {events?.filter(e => !e.allowBooking ).length}
             </span>
           </div>
         </div>
@@ -418,7 +505,7 @@ const Events = () => {
               </div>
 
               {/* Offers */}
-              <div className="events-form-group">
+              {/* <div className="events-form-group">
                 <label className="events-form-label">OFFERS (IN %)</label>
                 <div className="events-offers-input-wrapper">
                   <input
@@ -433,7 +520,7 @@ const Events = () => {
                   />
                   <span className="events-percentage-suffix">%</span>
                 </div>
-              </div>
+              </div> */}
 
               {/* Form Actions */}
               <div className="events-modal-actions">
@@ -457,7 +544,7 @@ const Events = () => {
       )}
 
       {/* Empty State */}
-      {filteredEvents.length === 0 && (
+      {filteredEvents?.length === 0 && (
         <div className="events-empty-state">
           <div className="events-empty-content">
             <IoTrophyOutline className="events-empty-icon" />
