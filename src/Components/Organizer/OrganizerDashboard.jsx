@@ -181,7 +181,7 @@ const OrganizationHome = ()=>{
           
     <div className="organization-form-container">
       <div className="form-header">
-        <h2 className="greeting">HELLO, TOURNAMENT ORGANIZER</h2>
+        <h2 className="greeting">HELLO, TOURNAMENT ORGANIZER    {organizerData?.fullName} </h2>
         <h1 className="form-title">ORGANIZATION DETAILS</h1>
       </div>
       
@@ -200,7 +200,7 @@ const OrganizationHome = ()=>{
             placeholder="Enter organization name"
           /> */}
           <div className='form-input'>
-            {organizerData? organizerData.fullName : "Mohammed Khalander"}
+            {organizerData? organizerData.organizationName : "Mohammed Khalander"}
           </div>
         </div>
 

@@ -25,6 +25,7 @@ const Events = () => {
   const [newEventData, setNewEventData] = useState({
     eventName: '',
     eventType: 'singles',
+    eventType2:'individual',
     matchType: 'knockout',
     maxTeams: '',
     teamEntryFee: '',
@@ -78,6 +79,7 @@ const Events = () => {
     setNewEventData({
       eventName: '',
       eventType: 'singles',
+      eventType2:'individual',
       matchType: 'knockout',
       maxTeams: '',
       teamEntryFee: '',
@@ -112,6 +114,7 @@ const Events = () => {
       const data = await response.json();
       if(data.success){
         toast.success(data.message);
+        fetchAllEvents();
       }else{
         console.log(data);
         toast.error(data.message);
@@ -390,6 +393,37 @@ const Events = () => {
                       className="events-radio-input"
                     />
                     <span className="events-radio-label">Doubles</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Event Type 2 */}
+              <div className="events-form-group">
+                <label className="events-form-label">
+                  EVENT TYPE <span className="events-required">*</span>
+                </label>
+                <div className="events-radio-group">
+                  <label className="events-radio-option">
+                    <input
+                      type="radio"
+                      name="eventType2"
+                      value="individual"
+                      checked={newEventData.eventType2 === 'individual'}
+                      onChange={handleInputChange}
+                      className="events-radio-input"
+                    />
+                    <span className="events-radio-label">Individual</span>
+                  </label>
+                  <label className="events-radio-option">
+                    <input
+                      type="radio"
+                      name="eventType2"
+                      value="group"
+                      checked={newEventData.eventType2 === 'group'}
+                      onChange={handleInputChange}
+                      className="events-radio-input"
+                    />
+                    <span className="events-radio-label">Group</span>
                   </label>
                 </div>
               </div>

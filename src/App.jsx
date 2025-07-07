@@ -29,15 +29,34 @@ import OrganizerLogin from './Components/Auth/Organizer/OrganizerLogin';
 import OrganizerSignUp from './Components/Auth/Organizer/OrganizerSignUp';
 import OTP from './Pages/Organizer/OTP';
 
-import AdminLogin from './Components/Auth/Admin/AdminLogin';
-import Layout from './Components/Admin/components/layout/Layout';
-import DashboardPage from './Components/Admin/pages/dashboard/index';
+
+
+
+import AdminLogin from "./Components/Auth/Admin/AdminLogin";
+
+import DashboardPage from "./Pages/Admin/pages/dashboard/index";
+import Layout from "./Pages/Admin/components/layout/Layout";
+import TournamentManagement from "./Pages/Admin/pages/dashboard/components/TournamentMangement";
+import TournamentForm from "./Pages/Admin/pages/dashboard/components/TournamentForm";
+import PlayersTable from "./Pages/Admin/pages/dashboard/components/PlayersTable";
+import OrganizationsTable from "./Pages/Admin/pages/dashboard/components/OrganizationsTable";
+
+
+
+
 
 
 import { OrganizerContext } from './Contexts/OrganizerContext/OrganizerContext'
 import { useContext, useEffect } from 'react';
 
 import { PlayerContext } from './Contexts/PlayerContext/PlayerContext';
+
+
+
+
+
+
+
 
 
 
@@ -82,9 +101,17 @@ const App = () => {
         <Route path='/otp/organizer' element={<OTP/>}/>
 
         {/* Admin Routes */}
-        <Route path='/login/admin' element={<AdminLogin/>}/>
-          <Route path="admin/dashboard" element={<DashboardPage />} />
+        {/* <Route path='/login/admin' element={<AdminLogin/>}/>
+          <Route path="admin/dashboard" element={<DashboardPage />} /> */}
+        <Route path="/login/admin" element={<AdminLogin />} />
 
+        <Route path="/admin" element={<Layout />}>
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="tournaments" element={<TournamentManagement />} />
+          <Route path="add-tournament" element={<TournamentForm />} />
+          <Route path="players" element={<PlayersTable />} />
+          <Route path="organizations" element={<OrganizationsTable />} />
+          </Route>
       </Routes>
 
       <ToastContainer position="top-center" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick={false} rtl={false}pauseOnFocusLoss draggable pauseOnHover theme="light" transition={Bounce} />

@@ -1,4 +1,4 @@
-// import React, { useState } from 'react';
+/*  import React, { useState } from 'react';
 // import './CSS/Teams.css';
 // import { IoAdd, IoSearchOutline, IoFilterOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoPeopleOutline, IoClose, IoPersonOutline, IoMailOutline, IoCallOutline, IoSchoolOutline, IoCheckmarkCircle, IoCloseCircle } from 'react-icons/io5';
 
@@ -109,7 +109,7 @@
 
 //   return (
 //     <div className="teams-container">
-//       {/* Teams Header */}
+//       {/* Teams Header 
 //       <div className="teams-header">
 //         <div className="teams-title-section">
 //           <h2 className="teams-main-title">Tournament Teams</h2>
@@ -121,7 +121,7 @@
 //         </button>
 //       </div>
 
-//       {/* Teams Controls */}
+//       {/* Teams Controls 
 //       <div className="teams-controls">
 //         <div className="teams-event-selector">
 //           <label className="teams-event-label">Choose Event:</label>
@@ -163,7 +163,7 @@
 //         </div>
 //       </div>
 
-//       {/* Teams Table */}
+//       {/* Teams Table 
 //       <div className="teams-table-container">
 //         <div className="teams-table-wrapper">
 //           <table className="teams-table">
@@ -175,7 +175,7 @@
 //                 <th className="teams-th teams-th-email">Email</th>
 //                 <th className="teams-th teams-th-mobile">Mobile</th>
 //                 <th className="teams-th teams-th-academy">Academy Name</th>
-//                 {/* <th className="teams-th teams-th-actions">Actions</th> */}
+//                 {/* <th className="teams-th teams-th-actions">Actions</th> 
 //               </tr>
 //             </thead>
 //             <tbody className="teams-table-body">
@@ -232,7 +232,7 @@
 //                         <IoTrashOutline />
 //                       </button>
 //                     </div>
-//                   </td> */}
+//                   </td> 
 //                 </tr>
 //               ))}
 //             </tbody>
@@ -240,7 +240,7 @@
 //         </div>
 //       </div>
 
-//       {/* Teams Summary */}
+//       {/* Teams Summary 
 //       <div className="teams-summary">
 //         <div className="teams-summary-stats">
 //           <div className="teams-stat-item">
@@ -262,7 +262,7 @@
 //         </div>
 //       </div>
 
-//       {/* Add Teams Modal */}
+//       {/* Add Teams Modal 
 //       {showAddTeamModal && (
 //         <div className="teams-modal-overlay" onClick={handleCloseModal}>
 //           <div className="teams-modal-container" onClick={(e) => e.stopPropagation()}>
@@ -402,7 +402,7 @@
 //         </div>
 //       )}
 
-//       {/* Empty State */}
+//       {/* Empty State 
 //       {filteredTeams.length === 0 && (
 //         <div className="teams-empty-state">
 //           <div className="teams-empty-content">
@@ -427,6 +427,8 @@
 
 // export default Teams;
 
+ */
+
 
 import React, { useState } from 'react';
 import './CSS/Teams.css';
@@ -434,12 +436,21 @@ import {
   IoAdd, IoSearchOutline, IoFilterOutline, IoClose, IoPersonOutline, IoMailOutline, IoCallOutline, IoSchoolOutline, IoCheckmarkCircle, IoCloseCircle, IoTrashOutline
 } from 'react-icons/io5';
 
-const EVENTS = [
-  { name: 'U9 BS', type: 'individual' },
-  { name: 'U11 BS', type: 'group' },
-  { name: 'U13 BS', type: 'individual' },
-  { name: 'U15 BS', type: 'group' }
-];
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+import { useContext, useEffect } from 'react';
+
+import { useParams } from 'react-router-dom';
+
+import { toast } from 'react-toastify';
+
+
+// const EVENTS = [
+//   { name: 'U9 BS', type: 'individual' },
+//   { name: 'U11 BS', type: 'group' },
+//   { name: 'U13 BS', type: 'individual' },
+//   { name: 'U15 BS', type: 'group' }
+// ];
 
 const initialIndividualMember = () => ({
   id: 1,
@@ -466,13 +477,28 @@ const initialGroupTeam = () => ({
 });
 
 const Teams = () => {
+
+  const { backend_URL } = useContext(OrganizerContext);
+
+  const { id } = useParams(); //This is Tournament Id
+
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [selectedEvent, setSelectedEvent] = useState(EVENTS[0].name);
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
+  
+  
+  const [allEvents,setAllEvents] = useState([]);
+  
+  const [selectedEvent, setSelectedEvent] = useState();
+  const [selectedEventId, setSelectedEventId] = useState();
 
   // Mock teams data
-  const [teams, setTeams] = useState([
+  const [teams, setTeams] = useState([]);
+
+
+  /**
+   * [
     { id: 1, name: 'Saharsh D', entry: 'Online', email: 'Pbdhilip@gmail.com', mobile: '9844435599', academyName: 'SBA', event: 'U9 BS', teamName: '' },
     { id: 2, name: 'Team Rocket', entry: 'Online', email: 'team@rocket.com', mobile: '-', academyName: 'Rocket Academy', event: 'U11 BS', teamName: 'Team Rocket', members: [
       { id: 1, name: 'Jessie', email: 'jessie@rocket.com', mobile: '1234567890', academyName: 'Rocket Academy', feesPaid: true },
@@ -484,21 +510,27 @@ const Teams = () => {
       { id: 7, name:'Darshan', email:'darshan@gmail.com', mobile: '6926348307', academyName: 'Rocket Academy', feesPaid: false},
       { id: 8, name:'Darshan', email:'darshan@gmail.com', mobile: '6926348307', academyName: 'Rocket Academy', feesPaid: false},
     ] }
-  ]);
+  ]
+   */
+
+
 
   // For modal form state
-  const eventType = EVENTS.find(e => e.name === selectedEvent)?.type || 'individual';
+  const eventType = allEvents.find(e => e.name === selectedEvent)?.eventType2 || 'individual';
   const [individualMember, setIndividualMember] = useState(initialIndividualMember());
   const [groupTeams, setGroupTeams] = useState([initialGroupTeam()]);
 
   // Filtered teams for table
-  const filteredTeams = teams.filter(team => {
+  const filteredTeams = teams?.filter(team => {
     const matchesSearch = (team.name || team.teamName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (team.academyName || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'all' || (team.entry || '').toLowerCase() === filterStatus;
     const matchesEvent = team.event === selectedEvent;
     return matchesSearch && matchesFilter && matchesEvent;
   });
+
+  // console.log(selectedEvent);
+
 
   // Modal open/close
   const handleAddTeams = () => {
@@ -556,19 +588,55 @@ const Teams = () => {
   };
 
   // Submit
-  const handleSubmitTeams = (e) => {
+  const handleSubmitTeams = async(e) => {
     e.preventDefault();
+
+
+    
     if (eventType === 'individual') {
-      setTeams(prev => [
-        ...prev,
-        {
-          ...individualMember,
-          id: prev.length + 1,
-          entry: 'Online',
-          event: selectedEvent
-        }
-      ]);
+      // setTeams(prev => [
+      //   ...prev,
+      //   {
+      //     ...individualMember,
+      //     id: prev.length + 1,
+      //     entry: 'Online',
+      //     event: selectedEvent
+      //   }
+      // ]);
+      // console.log(individualMember);
+
+          try{
+            // setIsSubmitting(true);
+            const fetchOptions = {
+              method:"POST",
+              credentials:"include",
+              headers:{
+                "Content-Type":"application/json"
+              },
+              body:JSON.stringify(individualMember)
+            }
+            if(selectedEventId){
+              const response = await fetch(`${backend_URL}/api/organizer/createIndividualTeam/${id}/${selectedEventId}`,fetchOptions);
+              const data = await response.json();
+              if(data.success){
+                toast.success(data.message);
+                console.log(data.message);
+              }else{
+                // console.log(data);
+                toast.error(data.message);
+              }
+            }
+          }catch(error){
+              console.log("Error in Front-End Create Tournament Handler ", error);
+              toast.error(error);
+          }finally{
+            // setIsSubmitting(false);
+          }
+
+
+
     } else {
+      
       const newTeams = groupTeams.map(team => ({
         id: teams.length + Math.random(),
         teamName: team.teamName,
@@ -576,14 +644,160 @@ const Teams = () => {
         event: selectedEvent,
         members: team.members
       }));
-      setTeams(prev => [...prev, ...newTeams]);
+
+      // console.log(groupTeams);
+
+      // console.log(newTeams[0]);
+
+      try{
+            // setIsSubmitting(true);
+            const fetchOptions = {
+              method:"POST",
+              credentials:"include",
+              headers:{
+                "Content-Type":"application/json"
+              },
+              body:JSON.stringify(newTeams[0])
+            }
+            if(selectedEventId){
+              const response = await fetch(`${backend_URL}/api/organizer/createGroupTeam/${id}/${selectedEventId}`,fetchOptions);
+              const data = await response.json();
+              if(data.success){
+                toast.success(data.message);
+                console.log(data.message);
+              }else{
+                console.log(data);
+                toast.error(data.message);
+              }
+            }
+          }catch(error){
+              console.log("Error in Front-End Create Tournament Handler ", error);
+              toast.error(error);
+          }finally{
+            // setIsSubmitting(false);
+          }
+
+      // setTeams(prev => [...prev, ...newTeams]);
     }
     handleCloseModal();
+    fetchTeams();
   };
 
   const getEntryBadgeClass = (entry) => {
     return (entry || '').toLowerCase() === 'online' ? 'teams-entry-online' : 'teams-entry-offline';
   };
+
+
+
+  // console.log(selectedEventId);
+
+
+  const fetchAllEvents = async (req,res)=>{
+
+    try{
+      const fetchOptions = {
+        method:"GET",
+        credentials:"include",
+      }
+
+      const response = await fetch(`${backend_URL}/api/organizer/allEvents/${id}`,fetchOptions);
+      const data = await response.json();
+
+      if(data.success){
+        // toast.success(data.message);
+        console.log(data.message);
+        setAllEvents(data.message);
+        setSelectedEvent(data.message.length > 0 ? data.message[0].name : '');
+        setSelectedEventId(data.message.length > 0 ? data.message[0]._id : '');
+      }else{
+        console.log(data);
+        toast.error(data.message);
+      }
+    }catch(error){
+        console.log("Error in Front-End Create Tournament Handler ", error);
+        toast.error(error);
+    } 
+
+  }
+
+
+
+  useEffect(()=>{ 
+    fetchAllEvents();
+  },[]);
+
+
+
+
+  const fetchTeams = async ()=>{
+
+    if(eventType=== 'individual'){
+
+      try{
+        const fetchOptions = {
+          method:"GET",
+          credentials:"include",
+        }
+
+        const response = await fetch(`${backend_URL}/api/organizer/getIndividualTeam/${id}/${selectedEventId}`,fetchOptions);
+        const data = await response.json();
+        
+        if(data.success){
+          // toast.success(data.message);
+          console.log(data.message);
+          setTeams(data.message);
+        }else{
+          console.log(data);
+          toast.error(data.message);
+        }
+      }catch(error){
+        console.log("Error in Front-End Create Tournament Handler ", error);
+        toast.error(error);
+      } 
+
+    } else{
+      try{
+        const fetchOptions = {
+          method:"GET",
+          credentials:"include",
+        }
+
+        const response = await fetch(`${backend_URL}/api/organizer/getGroupTeam/${id}/${selectedEventId}`,fetchOptions);
+        const data = await response.json();
+        
+        if(data.success){
+          // toast.success(data.message);
+          console.log(data.message);
+          setTeams(data.message);
+        }else{
+          console.log(data);
+          toast.error(data.message);
+        }
+      }catch(error){
+        console.log("Error in Front-End Create Tournament Handler ", error);
+        toast.error(error);
+      }
+    }
+  }
+
+  useEffect(()=>{ 
+    if(selectedEventId){
+      fetchTeams();
+    }
+  },[selectedEventId]);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <div className="teams-container">
@@ -605,10 +819,10 @@ const Teams = () => {
           <label className="teams-event-label">Choose Event:</label>
           <select
             value={selectedEvent}
-            onChange={(e) => setSelectedEvent(e.target.value)}
+            onChange={(e) =>{ setSelectedEvent(e.target.value); setSelectedEventId(allEvents.find(event => event.name === e.target.value)?._id); }}
             className="teams-event-select"
           >
-            {EVENTS.map(event => (
+            {allEvents.map(event => (
               <option key={event.name} value={event.name}>{event.name}</option>
             ))}
           </select>
@@ -665,8 +879,8 @@ const Teams = () => {
               </tr>
             </thead>
             <tbody className="teams-table-body">
-              {filteredTeams.map((team, index) => (
-                <tr key={team.id} className="teams-table-row">
+              {filteredTeams?.map((team, index) => (
+                <tr key={team._id} className="teams-table-row">
                   <td className="teams-td teams-td-sno">{index + 1}</td>
                   {eventType === 'group' ? (
                     <>
@@ -674,38 +888,38 @@ const Teams = () => {
                         <span className="teams-name-text">{team.teamName}</span>
                       </td>
                       <td className="teams-td teams-td-members">
-  <div className="team-members-grid">
-    {(team.members || []).map(member => (
-      <div className="team-member-card" key={member.id}>
-        <div className="team-member-header">
-          <span className="team-member-name">
-            <IoPersonOutline /> {member.name}
-          </span>
-          {member.feesPaid && (
-            <IoCheckmarkCircle className="team-member-fees-paid" title="Fees Paid" />
-          )}
-        </div>
-        <div className="team-member-info">
-          {member.email && (
-            <span className="team-member-info-item">
-              <IoMailOutline /> {member.email}
-            </span>
-          )}
-          {member.mobile && (
-            <span className="team-member-info-item">
-              <IoCallOutline /> {member.mobile}
-            </span>
-          )}
-          {member.academyName && (
-            <span className="team-member-info-item">
-              <IoSchoolOutline /> {member.academyName}
-            </span>
-          )}
-        </div>
-      </div>
-    ))}
-  </div>
-</td>
+                      <div className="team-members-grid">
+                        {(team.members || []).map(member => (
+                          <div className="team-member-card" key={member._id}>
+                            <div className="team-member-header">
+                              <span className="team-member-name">
+                                <IoPersonOutline /> {member.name}
+                              </span>
+                              {member.feesPaid && (
+                                <IoCheckmarkCircle className="team-member-fees-paid" title="Fees Paid" />
+                              )}
+                            </div>
+                            <div className="team-member-info">
+                              {member.email && (
+                                <span className="team-member-info-item">
+                                  <IoMailOutline /> {member.email}
+                                </span>
+                              )}
+                              {member.mobile && (
+                                <span className="team-member-info-item">
+                                  <IoCallOutline /> {member.mobile}
+                                </span>
+                              )}
+                              {member.academyName && (
+                                <span className="team-member-info-item">
+                                  <IoSchoolOutline /> {member.academyName}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </td>
 
                     </>
                   ) : (
@@ -745,18 +959,18 @@ const Teams = () => {
         <div className="teams-summary-stats">
           <div className="teams-stat-item">
             <span className="teams-stat-label">Total Teams:</span>
-            <span className="teams-stat-value">{filteredTeams.length}</span>
+            <span className="teams-stat-value">{filteredTeams?.length}</span>
           </div>
           <div className="teams-stat-item">
             <span className="teams-stat-label">Online Entries:</span>
             <span className="teams-stat-value teams-stat-online">
-              {filteredTeams.filter(t => t.entry === 'Online').length}
+              {filteredTeams?.filter(t => t.entry === 'online').length}
             </span>
           </div>
           <div className="teams-stat-item">
             <span className="teams-stat-label">Offline Entries:</span>
             <span className="teams-stat-value teams-stat-offline">
-              {filteredTeams.filter(t => t.entry === 'Offline').length}
+              {filteredTeams?.filter(t => t.entry === 'offline').length}
             </span>
           </div>
         </div>
@@ -865,9 +1079,9 @@ const Teams = () => {
                       </button>
                     </div>
                   ))}
-                  <button type="button" className="teams-add-team-btn" onClick={handleAddGroupTeam}>
-                    <IoAdd className="teams-add-member-icon" /> Add Another Team
-                  </button>
+                  {/* <button type="button" className="teams-add-team-btn" onClick={handleAddGroupTeam}> */}
+                    {/* <IoAdd className="teams-add-member-icon" /> Add Another Team */}
+                  {/* </button> */}
                 </>
               )}
               <div className="teams-form-note">
@@ -883,7 +1097,7 @@ const Teams = () => {
       )}
 
       {/* Empty State */}
-      {filteredTeams.length === 0 && (
+      {filteredTeams?.length === 0 && (
         <div className="teams-empty-state">
           <div className="teams-empty-content">
             <IoPersonOutline className="teams-empty-icon" />
@@ -906,3 +1120,4 @@ const Teams = () => {
 };
 
 export default Teams;
+

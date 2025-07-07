@@ -53,7 +53,7 @@ const OrganizerContextProvider = (props)=>{
             const data = await response.json();
 
             if(data.success){
-                // console.log(data);
+                console.log(data);
                 setOrganizerData(data.message);
             }else{
                 console.log(data.message);
