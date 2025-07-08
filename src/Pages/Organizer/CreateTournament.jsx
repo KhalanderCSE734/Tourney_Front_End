@@ -32,7 +32,18 @@ L.Icon.Default.mergeOptions({
 
 const CreateTournament = () => {
 
+
+  const { isOrganizerLoggedIn } = useContext(OrganizerContext);
+
   const navigate = useNavigate();
+
+    // useEffect(()=>{
+    //   if (!isOrganizerLoggedIn) {
+    //     navigate('/');
+    //   }
+    //  },[isOrganizerLoggedIn]);
+
+
 
   const [currentStep, setCurrentStep] = useState('basic');
   const [formData, setFormData] = useState({

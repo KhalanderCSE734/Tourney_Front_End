@@ -11,7 +11,7 @@ import Settings from './Settings';
 import Fixtures from './Fixtures';
 
 
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 
@@ -27,7 +27,16 @@ import { marked } from 'marked';
 const Tournament = () => {
 
 
-  const { backend_URL, fetchTournamentDetails, tournament } = useContext(OrganizerContext);
+  const { backend_URL, fetchTournamentDetails, tournament, isOrganizerLoggedIn } = useContext(OrganizerContext);
+
+  const navigate = useNavigate();
+
+  //   useEffect(()=>{
+  //   if (!isOrganizerLoggedIn) {
+  //     navigate('/');
+  //   }
+  //  },[isOrganizerLoggedIn]);
+
 
 
   const [activeTab, setActiveTab] = useState('basic-info');

@@ -2,14 +2,34 @@ import React, { useState } from 'react';
 import './CSS/Notification.css';
 import { IoChevronBack, IoAdd, IoSend, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoMailOutline, IoNotificationsOutline, IoCalendarOutline, IoMegaphoneOutline, IoClose, IoCheckmarkCircle, IoAlertCircle } from 'react-icons/io5';
 
+
+import { toast } from 'react-toastify';
+
+import { useNavigate } from 'react-router-dom';
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+import { useContext } from 'react';
+
+
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+
+
+
+
+
 const Notification = () => {
+
+  const { tournament } = useContext(OrganizerContext);
+  // const navigate = useNavigate();
+
+  // console.log(tournament);
+
   const [activeSection, setActiveSection] = useState('main');
   const [showComposeModal, setShowComposeModal] = useState(false);
   const [currentNotificationType, setCurrentNotificationType] = useState('');
   const [emailData, setEmailData] = useState({
     to: '',
-    cc: '',
-    bcc: '',
     subject: '',
     content: ''
   });
@@ -86,11 +106,18 @@ const Notification = () => {
     setShowComposeModal(true);
     // Pre-populate email data based on notification type
     if (currentNotificationType === 'tournament-promotion') {
+      const rawHtml = marked(tournament?.description || '');
+    const safeHtml = DOMPurify.sanitize(rawHtml);
+
+    // Create a complete HTML wrapper div
+    const div = `<div>${safeHtml}</div>`;
+    
       setEmailData(prev => ({
         ...prev,
-        subject: 'YONEX KARNATAKA STATE OPEN JUNIOR BADMINTON CHAMPIONSHIP',
-        content: getDefaultContent('tournament-promotion')
+        subject: `${tournament.name} - Tournament Promotion`,
+        content: div,
       }));
+
     } else if (currentNotificationType === 'fixtures') {
       setEmailData(prev => ({
         ...prev,
@@ -136,8 +163,6 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
     setShowComposeModal(false);
     setEmailData({
       to: '',
-      cc: '',
-      bcc: '',
       subject: '',
       content: ''
     });
@@ -198,7 +223,7 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
       </div>
 
       {/* Recent Notifications */}
-      <div className="notification-recent-section">
+      {/* <div className="notification-recent-section">
         <h3 className="notification-recent-title">Recent Notifications</h3>
         <div className="notification-recent-list">
           {sentNotifications.map((notification) => (
@@ -221,7 +246,7 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 
@@ -233,14 +258,11 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
           Back to Notifications
         </button>
         <h2 className="notification-section-view-title">{getSectionTitle()}</h2>
-        <button className="notification-compose-btn" onClick={handleComposeEmail}>
-          <IoAdd />
-          Compose Email
-        </button>
+        
       </div>
 
       <div className="notification-section-content-area">
-        <div className="notification-section-info">
+        {/* <div className="notification-section-info">
           <div className="notification-info-card">
             <h3>Email Recipients</h3>
             <p>All registered participants for this tournament will receive the notification.</p>
@@ -255,9 +277,13 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+        <button className="notification-compose-btn" onClick={handleComposeEmail}>
+          <IoAdd />
+          Compose Email
+        </button>
 
-        <div className="notification-history">
+        {/* <div className="notification-history">
           <h3>Notification History</h3>
           <div className="notification-history-list">
             {sentNotifications
@@ -282,7 +308,7 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
                 </div>
               ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -315,12 +341,12 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
                     value={emailData.to}
                     onChange={handleInputChange}
                     className="notification-field-input"
-                    placeholder="Recipients will be auto-populated"
+                    placeholder="Enter Emails (comma separated)"
                     readOnly
                   />
                 </div>
 
-                <div className="notification-field-group">
+                {/* <div className="notification-field-group">
                   <label className="notification-field-label">Cc</label>
                   <input
                     type="text"
@@ -342,7 +368,7 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
                     className="notification-field-input"
                     placeholder="Add BCC recipients"
                   />
-                </div>
+                </div> */}
 
                 <div className="notification-field-group">
                   <label className="notification-field-label">Subject</label>
@@ -359,13 +385,13 @@ https://playmatches.com/bengaluru/tournaments/detail/yonex-karnataka-state-open-
 
                 <div className="notification-field-group">
                   <label className="notification-field-label">Content</label>
-                  <div className="notification-editor-toolbar">
+                  {/* <div className="notification-editor-toolbar">
                     <button type="button" className="notification-toolbar-btn">B</button>
                     <button type="button" className="notification-toolbar-btn">I</button>
                     <button type="button" className="notification-toolbar-btn">U</button>
                     <button type="button" className="notification-toolbar-btn">≡</button>
                     <button type="button" className="notification-toolbar-btn">🔗</button>
-                  </div>
+                  </div> */}
                   <textarea
                     name="content"
                     value={emailData.content}

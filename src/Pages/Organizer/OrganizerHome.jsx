@@ -5,7 +5,7 @@ import OrganizerSidebar from '../../Components/Organizer/OrganizerSidebar';
 
 
 
-import OrganizerContextProvider from '../../Contexts/OrganizerContext/OrganizerContext';
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
 
 import { useContext } from 'react';
 
@@ -13,9 +13,21 @@ import { useContext } from 'react';
 
 import './CSS/OrganizerHome.css';
 
+
+import { useNavigate } from 'react-router-dom';
+
+
 const OrganizerHome = () => {
 
-  // import { } = useContext(OrganizerContextProvider);
+  const { isOrganizerLoggedIn } = useContext(OrganizerContext);
+  const navigate = useNavigate();
+
+  // useEffect(()=>{
+  //   if (!isOrganizerLoggedIn) {
+  //     navigate('/');
+  //   }
+  //  },[isOrganizerLoggedIn]);
+
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 

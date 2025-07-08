@@ -21,7 +21,16 @@ const OrganizerTournament = () => {
 
   const navigate = useNavigate();
   
-  const { isSidebarOpen, setSidebarOpen, toggleSidebar, backend_URL } = useContext(OrganizerContext);
+  const { isSidebarOpen, setSidebarOpen, toggleSidebar, backend_URL, isOrganizerLoggedIn } = useContext(OrganizerContext);
+
+
+    // useEffect(()=>{
+    //   if (!isOrganizerLoggedIn) {
+    //     navigate('/');
+    //   }
+    //  },[isOrganizerLoggedIn]);
+
+
   
 
   const [searchTerm, setSearchTerm] = useState('');

@@ -2,24 +2,39 @@ import React, { useState } from 'react';
 import './CSS/Payments.css';
 import { IoSearchOutline, IoFilterOutline, IoDownloadOutline, IoRefreshOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoCardOutline, IoWalletOutline, IoCheckmarkCircle, IoCloseCircle, IoTimeOutline } from 'react-icons/io5';
 
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+import { useContext } from 'react';
+import { toast } from 'react-toastify';
+
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import moment from 'moment';
+
+
 const Payments = () => {
+
+
+  const { backend_URL } = useContext(OrganizerContext);
+
+  const { id } = useParams();
+
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterMode, setFilterMode] = useState('all');
   const [sortBy, setSortBy] = useState('date');
 
   // Mock payment data based on the uploaded images
-  const [payments] = useState([
-    { id: 1, eventName: 'U11 BS', team: 'abc', email: 'khalandermohammed734@gmail.com', paymentId: '-', date: '1st Jul 12:18 pm', amount: 599, status: 'Success', mode: 'Offline' },
-    { id: 2, eventName: 'dummy12', team: 'Testing', email: 'khalandermohammed734@gmail.com', paymentId: '-', date: '1st Jul 12:10 pm', amount: 100, status: 'Success', mode: 'Offline' },
-    { id: 3, eventName: 'Testing', team: 'Name3/Name4', email: 'khalandermohammed734@gmail.com', paymentId: '-', date: '15th Jun 01:36 pm', amount: 500, status: 'Success', mode: 'Offline' },
-    { id: 4, eventName: 'U13 BD', team: 'Dhruva Charnu/Keyaan Abdul', email: 'vivikthmukunda@gmail.com', paymentId: '-', date: '20th Apr 11:19 am', amount: 999, status: 'Success', mode: 'Offline' },
-    { id: 5, eventName: 'U15 BD', team: 'mohith and charan', email: 'mohithmk48@gmail.com', paymentId: 'pay_QLC0Op8N3aTGBM', date: '20th Apr 10:48 am', amount: 999, status: 'Success', mode: 'Online' },
-    { id: 6, eventName: 'U13 GS', team: 'Shraddha Mukunda', email: 'vivikthmukunda@gmail.com', paymentId: '-', date: '20th Apr 09:45 am', amount: 599, status: 'Success', mode: 'Offline' },
-    { id: 7, eventName: 'U15 BS', team: 'Madhan RS', email: 'vivikthmukunda@gmail.com', paymentId: '-', date: '19th Apr 11:22 pm', amount: 599, status: 'Success', mode: 'Offline' },
-    { id: 8, eventName: 'U11 GS', team: 'Test Player', email: 'test@gmail.com', paymentId: 'pay_ABC123XYZ', date: '18th Apr 02:15 pm', amount: 750, status: 'Pending', mode: 'Online' },
-    { id: 9, eventName: 'U9 BS', team: 'Sample Team', email: 'sample@gmail.com', paymentId: '-', date: '17th Apr 03:30 pm', amount: 450, status: 'Failed', mode: 'Offline' }
-  ]);
+  const [payments,setPayments] = useState([]);
+
+  // const [paymentIndividual,setPaymentIndividual] = useState([]);
+  // const [paymentGroup,setPaymentGroup] = useState([]);
+
+  const [offlinePayment,setOfflinePayment] = useState(0);
+  const [onlinePayment,setOnlinePayment] = useState(0);
+
+
+
 
   // Revenue data
   const revenueData = {
@@ -39,9 +54,9 @@ const Payments = () => {
   const filteredPayments = payments.filter(payment => {
     const matchesSearch = payment.team.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          payment.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         payment.eventName.toLowerCase().includes(searchTerm.toLowerCase());
+                         payment.event.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || payment.status.toLowerCase() === filterStatus;
-    const matchesMode = filterMode === 'all' || payment.mode.toLowerCase() === filterMode;
+    const matchesMode = filterMode === 'all' || payment.entry.toLowerCase() === filterMode;
     return matchesSearch && matchesStatus && matchesMode;
   });
 
@@ -66,9 +81,97 @@ const Payments = () => {
     }
   };
 
-  const getModeBadgeClass = (mode) => {
-    return mode.toLowerCase() === 'online' ? 'payments-mode-online' : 'payments-mode-offline';
+  const getModeBadgeClass = (entry) => {
+    return entry.toLowerCase() === 'online' ? 'payments-mode-online' : 'payments-mode-offline';
   };
+
+
+  const fetchPayments = async () => {
+
+    try{
+
+      const fetchOptions = {
+        method:"GET",
+        credentials:"include",
+      }
+
+      const response = await fetch(`${backend_URL}/api/organizer/getPaymentDetails/${id}`,fetchOptions);
+      const data = await response.json();
+
+      if(data.success){
+        console.log(data);
+        let groupPayments = [];
+        let individualPayments = [];
+        const groupTeams = data.paymentsGroup;
+        const individualTeam = data.paymentsIndividual;
+        groupTeams.forEach((team) => {
+          team.members.forEach((member)=>{
+            groupPayments.push({
+              id: team._id,
+              event: team.event,
+              team: member.name,
+              email: member.email,
+              academyName:member.academyName,
+              date: moment(team.createdAt).format('Do MMM h:mm a'),
+              amount: team.eventId.entryFee,
+              status: "Success" ,
+              entry: team.entry
+            });
+          })
+        });
+
+        individualTeam.forEach((player)=>{
+          individualPayments.push({
+            id:player._id,
+            event:player.event,
+            team:player.name,
+            email:player.email,
+            academyName:player.academyName,
+            date:moment(player.createdAt).format('Do MMM h:mm a'),
+            amount:player.eventId.entryFee,
+            status:"Success",
+            entry:player.entry,
+          })   
+        })
+
+        console.log(groupPayments);
+        console.log(individualPayments);
+
+        setPayments([...groupPayments,...individualPayments]);
+
+      }else{
+        toast.error(`Error In Fetching Tournaments ${error}`);
+      }
+
+
+    }catch(error){
+      console.log("Error in Fetching Tournaments Front-end",error);
+      toast.error(`Error in Fetching Tournaments ${error}`);
+    }
+  
+  }
+
+
+  useEffect(()=>{ 
+    fetchPayments();
+    console.log(payments);
+  },[]);
+
+
+  useEffect(()=>{ 
+    const onlinePayments = payments.filter(payment => payment.entry.toLowerCase() === 'online');
+    const offlinePayments = payments.filter(payment => payment.entry.toLowerCase() === 'offline');
+
+    setOnlinePayment(onlinePayments.reduce((total, payment) => total + payment.amount, 0));
+    setOfflinePayment(offlinePayments.reduce((total, payment) => total + payment.amount, 0));
+  },[payments]);
+
+  console.log("Online Payments: ", onlinePayment);
+  console.log("Offline Payments: ", offlinePayment);
+
+
+
+
 
   return (
     <div className="payments-container">
@@ -103,7 +206,7 @@ const Payments = () => {
               <div className="payments-revenue-tickets">{revenueData.online.tickets} tickets</div>
               <div className="payments-revenue-amount">
                 <span className="payments-currency">INR</span>
-                <span className="payments-amount">{revenueData.online.amount.toLocaleString()}</span>
+                <span className="payments-amount">{onlinePayment}</span>
               </div>
             </div>
           </div>
@@ -117,7 +220,7 @@ const Payments = () => {
               <div className="payments-revenue-tickets">{revenueData.offline.tickets} tickets</div>
               <div className="payments-revenue-amount">
                 <span className="payments-currency">INR</span>
-                <span className="payments-amount">{revenueData.offline.amount.toLocaleString()}</span>
+                <span className="payments-amount">{offlinePayment}</span>
               </div>
             </div>
           </div>
@@ -131,7 +234,7 @@ const Payments = () => {
               <div className="payments-revenue-tickets">{totalTickets} tickets</div>
               <div className="payments-revenue-amount">
                 <span className="payments-currency">INR</span>
-                <span className="payments-amount">{totalRevenue.toLocaleString()}</span>
+                <span className="payments-amount">{onlinePayment + offlinePayment}</span>
               </div>
             </div>
           </div>
@@ -200,22 +303,22 @@ const Payments = () => {
               <tr>
                 <th className="payments-th payments-th-sno">S.No</th>
                 <th className="payments-th payments-th-event">Event Name</th>
-                <th className="payments-th payments-th-team">Team</th>
+                <th className="payments-th payments-th-team">Team <span className='text-2xl'> / </span> Individual </th>
                 <th className="payments-th payments-th-email">Email</th>
-                <th className="payments-th payments-th-payment-id">Payment Id</th>
+                { /* <th className="payments-th payments-th-payment-id">Payment Id</th> */ }
                 <th className="payments-th payments-th-date">Date</th>
                 <th className="payments-th payments-th-amount">Amount</th>
                 <th className="payments-th payments-th-status">Payment Status</th>
                 <th className="payments-th payments-th-mode">Mode</th>
-                <th className="payments-th payments-th-actions">Actions</th>
+                {/* <th className="payments-th payments-th-actions">Actions</th> */}
               </tr>
             </thead>
             <tbody className="payments-table-body">
               {filteredPayments.map((payment, index) => (
-                <tr key={payment.id} className="payments-table-row">
+                <tr key={index+1} className="payments-table-row">
                   <td className="payments-td payments-td-sno">{index + 1}</td>
                   <td className="payments-td payments-td-event">
-                    <span className="payments-event-text">{payment.eventName}</span>
+                    <span className="payments-event-text">{payment.event}</span>
                   </td>
                   <td className="payments-td payments-td-team">
                     <span className="payments-team-text">{payment.team}</span>
@@ -223,13 +326,15 @@ const Payments = () => {
                   <td className="payments-td payments-td-email">
                     <span className="payments-email-text">{payment.email}</span>
                   </td>
-                  <td className="payments-td payments-td-payment-id">
+                  {/* <td className="payments-td payments-td-payment-id">
                     <span className="payments-payment-id-text">
                       {payment.paymentId || '-'}
                     </span>
-                  </td>
+                  </td> */}
                   <td className="payments-td payments-td-date">
-                    <span className="payments-date-text">{payment.date}</span>
+                    <span className="payments-date-text">{payment.date}
+                      {/* moment(isoString).format('Do MMM h:mm a'); '2025-07-08T06:50:11.308Z' */}
+                    </span>
                   </td>
                   <td className="payments-td payments-td-amount">
                     <span className="payments-amount-text">₹{payment.amount}</span>
@@ -243,11 +348,11 @@ const Payments = () => {
                     </span>
                   </td>
                   <td className="payments-td payments-td-mode">
-                    <span className={`payments-mode-badge ${getModeBadgeClass(payment.mode)}`}>
-                      {payment.mode}
+                    <span className={`payments-mode-badge ${getModeBadgeClass(payment.entry)}`}>
+                      {payment.entry}
                     </span>
                   </td>
-                  <td className="payments-td payments-td-actions">
+                  {/* <td className="payments-td payments-td-actions">
                     <div className="payments-action-buttons">
                       <button 
                         className="payments-action-btn-small payments-view-btn"
@@ -268,7 +373,7 @@ const Payments = () => {
                         <IoTrashOutline />
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
