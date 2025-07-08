@@ -22,6 +22,16 @@ import { ToastContainer, Bounce } from 'react-toastify';
 
 
 
+import Event from './Pages/Player/Events';
+import TournamentDetail from './Pages/Player/TournamentDetail';
+import Tournaments from './Pages/Player/Tournaments';
+import RegistrationForm from "@/pages/Player/RegistrationForm";
+import Fixtures from './Pages/Player/Fixtures';
+
+
+
+
+
 import PlayerLogin from './Components/Auth/Player/PlayerLogin';
 import PlayerSignUp from './Components/Auth/Player/PlayerSignUp';
 import OtpPlayer from './Pages/Player/OtpPlayer';
@@ -95,10 +105,31 @@ const App = () => {
         <Route path='/signup/player' element={<PlayerSignUp/>}/>
         <Route path='/otp/player' element={<OtpPlayer/>}/>
 
+
+
+      <Route path="/events/:id" element={<Event />} />
+        <Route path="/tournaments" element={<Tournaments />} />
+        <Route path="/tournament/:id" element={<TournamentDetail />} />
+        <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/fixtures" element={<Fixtures />} />
+
+
+
+
+
+
+
+
+
+
         {/* Organizer Routes */}
         <Route path='/login/organizer' element={<OrganizerLogin/>}/>
         <Route path='/signup/organizer' element={<OrganizerSignUp/>}/>
         <Route path='/otp/organizer' element={<OTP/>}/>
+      
+
+
+
 
         {/* Admin Routes */}
         {/* <Route path='/login/admin' element={<AdminLogin/>}/>

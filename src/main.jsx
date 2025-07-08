@@ -21,13 +21,14 @@ import { BrowserRouter } from 'react-router-dom';
 import OrganizerContextProvider from './Contexts/OrganizerContext/OrganizerContext';
 import AdminContextProvider from './Contexts/AdminContext/AdminContext';
 import PlayerContextProvider from './Contexts/PlayerContext/PlayerContext';
-
+import AppContextProvider from './Contexts/AppContext/AppContext';
 
 
 
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter> 
+  <AppContextProvider>
    <AdminContextProvider>
     <OrganizerContextProvider>
      <PlayerContextProvider>
@@ -35,5 +36,6 @@ createRoot(document.getElementById('root')).render(
      </PlayerContextProvider>
     </OrganizerContextProvider>
    </AdminContextProvider>
+  </AppContextProvider>
   </BrowserRouter>
 )

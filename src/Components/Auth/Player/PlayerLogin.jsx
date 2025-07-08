@@ -2,15 +2,17 @@ import React from 'react'
 
 import '../CSS/PlayerLogin.css';
 
-import {useState} from 'react';
+import {useState, useContext} from 'react';
 import { IoChevronBack, IoLogoGoogle } from 'react-icons/io5';
 
 import {useNavigate} from 'react-router-dom';
+import { PlayerContext } from '../../../Contexts/PlayerContext/PlayerContext';
+import { toast } from 'react-toastify';
 
 const PlayerLogin = () => {
 
   const navigate = useNavigate();
-
+  const { backend_URL, setIsPlayerLoggedIn, getAuthStatusPlayer } = useContext(PlayerContext);
   
   const [formData, setFormData] = useState({
     email: '',
@@ -32,16 +34,38 @@ const PlayerLogin = () => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Player login:', formData);
+    try {
+      const fetchOptions = {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      }
+      
+      const response = await fetch(`${backend_URL}/api/player/login`, fetchOptions);
+      const data = await response.json();
+      
+      if (data.success) {
+        toast.success(data.message);
+        setIsPlayerLoggedIn(true);
+        getAuthStatusPlayer();
+        navigate('/'); // Redirect to home page after successful login
+      } else {
+        toast.error(data.message || "Login failed");
+      }
+    } catch (error) {
+      console.log(`Error in Login Handler (Player) ${error}`);
+      toast.error(`Login failed: ${error.message}`);
+    } finally {
       setIsSubmitting(false);
-    }, 1500);
+    }
   };
 
   const handleGoogleLogin = () => {
     // Handle Google login
-    console.log('Google login initiated');
+    toast.info("Google login is not implemented yet");
   };
 
   

@@ -97,7 +97,6 @@ const TournamentManagement = () => {
       const params = new URLSearchParams({
         ...(tabValue === "approved" && { isVerified: "true" }),
         ...(tabValue === "pending" && { isVerified: "false" }),
-        ...(tabValue === "rejected" && { isVerified: "false" }),
         ...(searchInput && { search: searchInput }),
         sortBy: "createdAt",
         sortOrder: "desc",
@@ -156,15 +155,10 @@ const TournamentManagement = () => {
   const filteredTournaments = tournaments.filter((tournament) => {
     // Tab filtering
     if (tabValue === "pending") {
-      if (tournament.isVerified || tournament.status === "cancelled")
-        return false;
+      if (tournament.isVerified) return false;
     }
     if (tabValue === "approved") {
       if (!tournament.isVerified) return false;
-    }
-    if (tabValue === "rejected") {
-      if (tournament.isVerified || tournament.status !== "cancelled")
-        return false;
     }
     // Search filtering
     const matchesSearch =
@@ -257,7 +251,6 @@ const TournamentManagement = () => {
           <Tab label="All" value="all" />
           <Tab label="Pending" value="pending" />
           <Tab label="Approved" value="approved" />
-          <Tab label="Rejected" value="rejected" />
         </Tabs>
       </Stack>
 

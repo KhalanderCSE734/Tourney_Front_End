@@ -3,15 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 import Navigation from "./Navigation";
-
 import { useNavigate } from 'react-router-dom';
 
 const HeroSection = () => {
-
-
-  const navigate = useNavigate();
-
-
+const navigate = useNavigate();
 
   return (
 
@@ -52,9 +47,9 @@ const HeroSection = () => {
             
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-              <Link to="/events">
+              <Link to="/tournaments">
                 <Button size="lg" className="bg-red-500 hover:bg-red-600 text-white font-semibold px-8 py-4 text-lg cursor-pointer">
-                  Explore Events
+                  Explore Tournaments
                 </Button>
               </Link>
             </div>

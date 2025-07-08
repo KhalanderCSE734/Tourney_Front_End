@@ -13,6 +13,7 @@ import { useContext } from "react";
 
 
 import { PlayerContext } from "../Contexts/PlayerContext/PlayerContext";
+import { AppContext } from "../Contexts/AppContext/AppContext";
 
 
 
@@ -23,6 +24,7 @@ const Navigation = () => {
 
   const { isPlayerLoggedIn, setIsPlayerLoggedIn, playerData,setPlayerData, playerMail,setPlayerMail, getAuthStatusPlayer } = useContext(PlayerContext);
 
+  const { selectedLocation, setSelectedLocation } = useContext(AppContext);
 
   const location = useLocation();
   const isHomePage = location.pathname === "/";
@@ -60,6 +62,16 @@ const Navigation = () => {
         }
   }
 
+  // Handle location change
+  const handleLocationChange = (e) => {
+    setSelectedLocation(e.target.value);
+    
+    // Navigate to tournaments page if not already there and a location is selected
+    if (location.pathname !== '/tournaments' && e.target.value !== 'all') {
+      navigate('/tournaments');
+    }
+  };
+
 
 
 
@@ -83,29 +95,28 @@ const Navigation = () => {
             <Link to="/" className={`hover:text-primary transition-colors ${isHomePage ? "text-white" : "text-gray-700"}`}>
               Home
             </Link>
-            <Link to="/events" className={`hover:text-primary transition-colors ${isHomePage ? "text-white" : "text-gray-700"}`}>
-              Events
+            <Link to="/tournaments" className={`hover:text-primary transition-colors ${isHomePage ? "text-white" : "text-gray-700"}`}>
+              Tournaments
             </Link>
           </div>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search Sports"
-                className="pl-10 bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-500"
-              />
-            </div>
+          {/* Navigation spacer (replacing buttons) */}
+          <div className="hidden md:flex items-center flex-1 max-w-md mx-8 justify-center">
           </div>
 
           {/* Location and Auth */}
           <div className="flex items-center space-x-4">
-            <select className={`hidden md:flex items-center space-x-2 ${isHomePage ? "text-white" : "text-gray-700"} `}>
-              {/* <MapPin className="w-4 h-4" /> */}
-              <option className="text-black">Bengaluru</option>
-              <option className="text-black">Delhi</option>
-              <option className="text-black">Kolkatha</option>
+            <select 
+              className={`hidden md:flex items-center space-x-2 ${isHomePage ? "text-white" : "text-gray-700"} `}
+              value={selectedLocation}
+              onChange={handleLocationChange}
+            >
+              <option value="all" className="text-black">All Locations</option>
+              <option value="Bangalore" className="text-black">Bengaluru</option>
+              <option value="Delhi" className="text-black">Delhi</option>
+              <option value="Kolkata" className="text-black">Kolkata</option>
+              <option value="Chennai" className="text-black">Chennai</option>
+              <option value="Mumbai" className="text-black">Mumbai</option>
             </select>
 
             {/* {user ? (

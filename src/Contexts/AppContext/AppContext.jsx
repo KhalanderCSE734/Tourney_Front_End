@@ -1,37 +1,15 @@
-import React from 'react';
+import React, { createContext, useState } from 'react';
 
-import { useState, createContext } from 'react';
+export const AppContext = createContext();
 
+export const AppProvider = ({ children }) => {
+  const [selectedLocation, setSelectedLocation] = useState('all');
 
-import { useNavigate } from'react-router-dom';
+  return (
+    <AppContext.Provider value={{ selectedLocation, setSelectedLocation }}>
+      {children}
+    </AppContext.Provider>
+  );
+};
 
-const AppContext = createContext();
-
-
-import { toast } from 'react-toastify';
-
-
-
-const AppContextProvider = (props)=>{
-
-
-
-
-    const value = {
-        
-    };
-
-
-    return (
-        <AppContext.Provider value={value}>
-            {props.children}
-        </AppContext.Provider>
-    )
-
-
-
-}
-
-
-export { AppContext };
-export default AppContextProvider;
+export default AppProvider;
