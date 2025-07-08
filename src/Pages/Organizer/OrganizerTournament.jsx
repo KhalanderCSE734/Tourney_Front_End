@@ -230,65 +230,57 @@ const OrganizerTournament = () => {
 
           <div className="organizer-tournament-grid">
             {filteredTournaments.map((tournament) => (
-              <div key={tournament._id} className="organizer-tournament-card">
-                <div className="organizer-tournament-card-header">
-                  <div className="organizer-tournament-card-title-section">
-                    <h3 className="organizer-tournament-card-title">{tournament.name}</h3>
-                    <div className="organizer-tournament-card-badges">
-                      <span className="organizer-tournament-sport-badge">{tournament.sport}</span>
-                      <span className={`organizer-tournament-status-badge ${getStatusBadgeClass(tournament.status)}`}>
-                        {tournament.status}
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="organizer-tournament-card-details">
-                  <div className="organizer-tournament-detail-item">
-                    <IoCalendarOutline className="organizer-tournament-detail-icon" />
-                    <span className="organizer-tournament-detail-text"> { new Date(tournament.startDate).toLocaleDateString() } - { new Date(tournament.endDate).toLocaleDateString() } </span>
-                  </div>
-                  <div className="organizer-tournament-detail-item">
-                    {/* <IoLocation className="organizer-tournament-detail-icon" /> */}
-                    <span className="organizer-tournament-detail-text">{tournament.location}</span>
-                  </div>
-                  {/* <div className="organizer-tournament-detail-item">
-                    <IoPeopleOutline className="organizer-tournament-detail-icon" />
-                    <span className="organizer-tournament-detail-text">{tournament.participants}</span>
-                  </div> */}
-                </div>
+             <div key={tournament._id} className="organizer-tournament-card">
+  <div className="organizer-tournament-card-image-wrapper">
+    <img
+      className="organizer-tournament-card-image"
+      src={tournament.coverImage || '/default-tournament.jpg'}
+      alt={tournament.name}
+      onError={e => { e.target.src = '/default-tournament.jpg'; }}
+    />
+  </div>
+  <div className="organizer-tournament-card-header">
+    <div className="organizer-tournament-card-title-section">
+      <h3 className="organizer-tournament-card-title">{tournament.name}</h3>
+      <div className="organizer-tournament-card-badges">
+        <span className="organizer-tournament-sport-badge">{tournament.sport}</span>
+        <span className={`organizer-tournament-status-badge ${getStatusBadgeClass(tournament.status)}`}>
+          {tournament.status}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div className="organizer-tournament-card-details">
+    <div className="organizer-tournament-detail-item">
+      <IoCalendarOutline className="organizer-tournament-detail-icon" />
+      <span className="organizer-tournament-detail-text">
+        {new Date(tournament.startDate).toLocaleDateString()} - {new Date(tournament.endDate).toLocaleDateString()}
+      </span>
+    </div>
+    <div className="organizer-tournament-detail-item">
+      <span className="organizer-tournament-detail-text">{tournament.location}</span>
+    </div>
+  </div>
+  <div className="organizer-tournament-card-actions">
+    <button 
+      className="organizer-tournament-action-btn organizer-tournament-view-btn"
+      onClick={() => handleView(tournament._id)}
+    >
+      <IoEyeOutline className="organizer-tournament-action-icon" />
+      View
+    </button>
+    <button 
+      className="organizer-tournament-action-btn organizer-tournament-delete-btn"
+      onClick={() => handleDelete(tournament._id)}
+    >
+      <IoTrashOutline className="organizer-tournament-action-icon" />
+      Delete
+    </button>
+  </div>
+</div>
 
-                {/* <div className="organizer-tournament-card-stats">
-                  <div className="organizer-tournament-stat-group">
-                    <span className="organizer-tournament-stat-label">Events</span>
-                    <span className="organizer-tournament-stat-value">{tournament.events.length} Events</span>
-                  </div>
-                </div> */}
 
-                <div className="organizer-tournament-card-actions">
-                  <button 
-                    className="organizer-tournament-action-btn organizer-tournament-view-btn"
-                    onClick={() => handleView(tournament._id)}
-                  >
-                    <IoEyeOutline className="organizer-tournament-action-icon" />
-                    View
-                  </button>
-                  {/* <button 
-                    className="organizer-tournament-action-btn organizer-tournament-edit-btn"
-                    onClick={() => handleEdit(tournament.id)}
-                  >
-                    <IoCreateOutline className="organizer-tournament-action-icon" />
-                    Edit
-                  </button> */}
-                  <button 
-                    className="organizer-tournament-action-btn organizer-tournament-delete-btn"
-                    onClick={() => handleDelete(tournament.id)}
-                  >
-                    <IoTrashOutline className="organizer-tournament-action-icon" />
-                    Delete
-                  </button>
-                </div>
-              </div>
             ))}
           </div>
 

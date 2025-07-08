@@ -12,6 +12,11 @@ import { PlayerContext } from "@/Contexts/PlayerContext/PlayerContext";
 import { toast } from "react-toastify";
 import { marked } from 'marked';
 
+
+
+
+
+
 // Add CSS for animations
 const animationStyles = `
   @keyframes fadeIn {
