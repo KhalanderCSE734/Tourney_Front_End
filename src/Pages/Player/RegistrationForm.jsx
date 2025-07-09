@@ -1,4 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,22 +8,55 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Plus, Trash2 } from "lucide-react";
 
+const backend_URL = import.meta.env.VITE_BACKEND_URL;
+
 const RegistrationForm = () => {
   const location = useLocation();
   const eventName = location.state?.eventName || "Event";
   const entryFee = location.state?.entryFee || 0;
+  const TournamentId = location.state?.TournamentId;
 
+  const [customFields, setCustomFields] = useState([]);
   const [members, setMembers] = useState([
     {
       name: "",
       mobile: "",
       email: "",
-      aadhar: null,
-      aadharName: "",
+      academyName: "",
+      customFieldValues: {}
     }
   ]);
-  
   const [errors, setErrors] = useState([{}]);
+  const [loading, setLoading] = useState(true);
+  const [teamName, setTeamName] = useState("");
+
+  // Fetch customFields from backend
+  React.useEffect(() => {
+    const fetchTournament = async () => {
+      if (!TournamentId) return;
+      try {
+        const res = await fetch(`${backend_URL}/api/player/tournaments/${TournamentId}`);
+        const data = await res.json();
+        if (data.success && data.message?.settings?.customFields) {
+          setCustomFields(data.message.settings.customFields);
+          // Reinitialize members with new custom fields
+          setMembers(members => members.map(member => ({
+            ...member,
+            customFieldValues: data.message.settings.customFields.reduce((acc, field) => {
+              acc[field.fieldName] = member.customFieldValues?.[field.fieldName] || "";
+              return acc;
+            }, {})
+          })));
+        }
+      } catch (err) {
+        toast.error("Failed to load tournament custom fields");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTournament();
+    // eslint-disable-next-line
+  }, [TournamentId]);
 
   const validate = () => {
     const newErrors = members.map(member => {
@@ -29,21 +64,32 @@ const RegistrationForm = () => {
       if (!member.name.trim()) memberErrors.name = "Name is required";
       if (!/^\d{10}$/.test(member.mobile)) memberErrors.mobile = "Enter a valid 10-digit mobile number";
       if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(member.email)) memberErrors.email = "Enter a valid email";
-      if (!member.aadhar) memberErrors.aadhar = "Aadhar file is required";
+      if (!member.academyName.trim()) memberErrors.academyName = "Academy name is required";
+      
+      // Validate custom fields
+      customFields.forEach(field => {
+        if (field.isMandatory && !member.customFieldValues[field.fieldName]?.trim()) {
+          memberErrors[field.fieldName] = `${field.fieldName} is required`;
+        }
+      });
+      
       return memberErrors;
     });
     return newErrors;
   };
 
   const handleChange = (index, e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     const updatedMembers = [...members];
     
-    if (name === "aadhar") {
+    // Check if this is a custom field
+    if (customFields.some(field => field.fieldName === name)) {
       updatedMembers[index] = {
         ...updatedMembers[index],
-        aadhar: files[0],
-        aadharName: files[0]?.name || ""
+        customFieldValues: {
+          ...updatedMembers[index].customFieldValues,
+          [name]: value
+        }
       };
     } else {
       updatedMembers[index] = {
@@ -60,8 +106,12 @@ const RegistrationForm = () => {
       name: "",
       mobile: "",
       email: "",
-      aadhar: null,
-      aadharName: ""
+      academyName: "",
+      // Initialize custom fields for the new member
+      customFieldValues: customFields.reduce((acc, field) => {
+        acc[field.fieldName] = "";
+        return acc;
+      }, {})
     }]);
     setErrors([...errors, {}]);
   };
@@ -78,18 +128,97 @@ const RegistrationForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
     
     const hasErrors = validationErrors.some(error => Object.keys(error).length > 0);
-    
-    if (!hasErrors) {
-      alert("Registration submitted!");
-      console.log("Form submitted with members:", members);
+    if (hasErrors) return;
+
+    const TournamentId = location.state?.TournamentId;
+    const eventId = location.state?.eventId;
+    if (!TournamentId || !eventId) {
+      alert("Tournament or Event ID missing!");
+      return;
+    }
+
+    let allSuccess = true;
+    let errorMsg = '';
+
+    if (members.length > 1) {
+      // Group registration
+      if (!teamName || !teamName.trim()) {
+        toast.error("Team name is required for group registration.");
+        return;
+      }
+      const membersPayload = members.map(member => ({
+        name: member.name,
+        email: member.email,
+        mobile: member.mobile,
+        academyName: member.academyName,
+        feesPaid: false, // or true if you want to mark as paid
+        customFields: member.customFieldValues // send as nested object for backend
+      }));
+      try {
+        const res = await fetch(
+          `${backend_URL}/api/organizer/createGroupTeam/${TournamentId}/${eventId}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ teamName, members: membersPayload }),
+            credentials: 'include',
+          }
+        );
+        const data = await res.json();
+        if (!data.success) {
+          allSuccess = false;
+          errorMsg = data.message || 'Group registration failed.';
+        }
+      } catch (err) {
+        allSuccess = false;
+        errorMsg = err.message || 'Network error during group registration.';
+      }
+    } else {
+      // Individual registration (keep previous logic)
+      const member = members[0];
+      const payload = {
+        name: member.name,
+        email: member.email,
+        mobile: member.mobile,
+        academyName: member.academyName,
+        feesPaid: false, // or true if you want to mark as paid
+        ...member.customFieldValues
+      };
+      try {
+        const res = await fetch(
+          `${backend_URL}/api/organizer/createIndividualTeam/${TournamentId}/${eventId}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            credentials: 'include',
+          }
+        );
+        const data = await res.json();
+        if (!data.success) {
+          allSuccess = false;
+          errorMsg = data.message || 'Registration failed.';
+        }
+      } catch (err) {
+        allSuccess = false;
+        errorMsg = err.message || 'Network error during registration.';
+      }
+    }
+
+    if (allSuccess) {
+      toast.success('Registration submitted successfully!');
+      // Optionally, redirect or clear form
+    } else {
+      toast.error(`Error: ${errorMsg}`);
     }
   };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
@@ -102,6 +231,23 @@ const RegistrationForm = () => {
             </h2>
             <form onSubmit={handleSubmit} className="space-y-8">
               
+              {/* Team Name (for group registration) */}
+              {members.length > 1 && (
+                <div className="mb-6">
+                  <label className="block text-sm font-medium mb-1">
+                    Team Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="teamName"
+                    value={teamName}
+                    onChange={e => setTeamName(e.target.value)}
+                    className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Enter team name"
+                  />
+                </div>
+              )}
+
               {members.map((member, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-5 relative">
                   <div className="flex justify-between items-center mb-4">
@@ -167,32 +313,42 @@ const RegistrationForm = () => {
                       )}
                     </div>
                     
-                    {/* Aadhar Upload */}
+                    {/* Academy Name */}
                     <div>
-                      <label className="block text-sm font-medium mb-1">Upload Aadhaar</label>
-                      <div className="flex items-center gap-3">
-                        <label
-                          htmlFor={`aadhar-upload-${index}`}
-                          className="bg-red-500 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-primary/90 transition"
-                        >
-                          Choose File
-                        </label>
-                        <input
-                          id={`aadhar-upload-${index}`}
-                          type="file"
-                          name="aadhar"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={(e) => handleChange(index, e)}
-                          className="hidden"
-                        />
-                        <span className="text-xs text-gray-600">
-                          {member.aadharName ? `Selected: ${member.aadharName}` : "No file chosen"}
-                        </span>
-                      </div>
-                      {errors[index]?.aadhar && (
-                        <p className="text-red-500 text-xs mt-1">{errors[index].aadhar}</p>
+                      <label className="block text-sm font-medium mb-1">Academy Name</label>
+                      <input
+                        type="text"
+                        name="academyName"
+                        value={member.academyName}
+                        onChange={(e) => handleChange(index, e)}
+                        className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Enter academy name"
+                      />
+                      {errors[index]?.academyName && (
+                        <p className="text-red-500 text-xs mt-1">{errors[index].academyName}</p>
                       )}
                     </div>
+
+                    {/* Custom Fields */}
+                    {customFields.map((field) => (
+                      <div key={field.fieldName}>
+                        <label className="block text-sm font-medium mb-1">
+                          {field.fieldName}
+                          {field.isMandatory && <span className="text-red-500 ml-1">*</span>}
+                        </label>
+                        <input
+                          type="text"
+                          name={field.fieldName}
+                          value={member.customFieldValues[field.fieldName] || ""}
+                          onChange={(e) => handleChange(index, e)}
+                          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                          placeholder={field.hintText || `Enter ${field.fieldName}`}
+                        />
+                        {errors[index]?.[field.fieldName] && (
+                          <p className="text-red-500 text-xs mt-1">{errors[index][field.fieldName]}</p>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}

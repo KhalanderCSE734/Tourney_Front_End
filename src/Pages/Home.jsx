@@ -8,6 +8,10 @@ import { useContext } from 'react'
 import { toast } from 'react-toastify'
 
 
+import HomeTournamentsSection from './HomeTournamentsSection'
+import Footer from "@/components/Footer";
+
+
 const Home = () => {
 
   const { updateTournamentStatus } = useContext(AppContext);
@@ -22,6 +26,8 @@ const Home = () => {
   return (
     <>
       <HeroSection/>
+      <HomeTournamentsSection/>
+      <Footer/>
     </>
   )
 }

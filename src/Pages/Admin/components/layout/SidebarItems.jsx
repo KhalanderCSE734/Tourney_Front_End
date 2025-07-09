@@ -24,11 +24,11 @@ const navItems = [
   },
   { text: "Users", icon: <UsersIcon />, path: "players" },
   { text: "Organizations", icon: <UsersIcon />, path: "organizations" },
-  {
-    text: "Create Tournament",
-    icon: <AnalyticsIcon />,
-    path: "/admin/add-tournament",
-  },
+  // {
+  //   text: "Create Tournament",
+  //   icon: <AnalyticsIcon />,
+  //   path: "/admin/add-tournament",
+  // },
   // { text: "Settings", icon: <SettingsIcon />, path: "/settings" },
 ];
 

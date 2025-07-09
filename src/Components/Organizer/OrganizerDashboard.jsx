@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './CSS/OrganizerDashboard.css';
 
 
@@ -12,7 +12,7 @@ import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerConte
 
 import { useContext } from 'react';
 
-
+import { toast } from 'react-toastify';
 
 
 
@@ -42,6 +42,10 @@ const OrganizerDashboard = ({ toggleSidebar }) => {
 
   const navigate = useNavigate();
 
+  const { backend_URL } = useContext(OrganizerContext);
+
+  const [dashboardData, setDashboardData] = useState(null);
+
 
   
   // NEW: Data for the organization tabs
@@ -53,6 +57,34 @@ const OrganizerDashboard = ({ toggleSidebar }) => {
   ];
 
 
+        const fetchDashBoardDetails = async ()=>{
+          try{
+            const fetchOptions = {
+              method:"GET",
+              credentials:"include",
+            }
+      
+            const response = await fetch(`${backend_URL}/api/organizer/dashboard`,fetchOptions);
+            const data = await response.json();
+      
+            if(data.success){
+              console.log(data);
+              setDashboardData(data.dashboard_data);
+            }else{
+              toast.error(`Error In Fetching Organizer Dashboard Details ${data.message}`);
+            }
+            
+            
+          }catch(error){
+            console.log("Error in Fetching Organizer Dashboard Details Front-end",error);
+            toast.error(`Error in Fetching Organizer Dashboard Details ${error}`);
+          }
+        }
+
+
+        useEffect(()=>{
+          fetchDashBoardDetails();
+        },[]);
   
 
 
@@ -76,10 +108,10 @@ const OrganizerDashboard = ({ toggleSidebar }) => {
       </header>
 
       <section className="overview-cards">
-        <StatCard title="Total Organizations" value="2" icon={<TrophyIcon />} iconClass="trophy" />
-        <StatCard title="Active Tournaments" value="5" icon={<CalendarIcon />} iconClass="calendar" />
-        <StatCard title="Total Participants" value="650" icon={<UsersIcon />} iconClass="users" />
-        <StatCard title="Completed Events" value="18" icon={<ChartIcon />} iconClass="chart" />
+        <StatCard title="Total Tournaments" value={dashboardData?.totalTournaments} icon={<TrophyIcon />} iconClass="trophy" />
+        <StatCard title="Total Events" value={dashboardData?.totalEvents} icon={<CalendarIcon />} iconClass="calendar" />
+        <StatCard title="Total Participants" value={dashboardData?.totalParticipants} icon={<UsersIcon />} iconClass="users" />
+        <StatCard title="Total Members" value={dashboardData?.totalMembers} icon={<ChartIcon />} iconClass="chart" />
       </section>
 
       <section className="organizations-section">

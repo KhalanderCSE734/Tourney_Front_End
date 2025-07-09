@@ -56,14 +56,14 @@ const navigate = useNavigate();
           </div>
           
           {/* Pagination Dots */}
-          <div className="flex justify-center space-x-3 mt-12">
+          {/* <div className="flex justify-center space-x-3 mt-12">
             <div className="w-3 h-3 bg-white rounded-full"></div>
             <div className="w-3 h-3 bg-white/50 rounded-full"></div>
             <div className="w-3 h-3 bg-white/50 rounded-full"></div>
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-white/50 rounded-full"></div>
             <div className="w-3 h-3 bg-white/50 rounded-full"></div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

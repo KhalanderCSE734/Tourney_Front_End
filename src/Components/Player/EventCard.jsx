@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { PlayerContext } from "@/Contexts/PlayerContext/PlayerContext";
 import { toast } from "react-toastify";
 
-const EventCard = ({ name, fee, participants, icon }) => {
+const EventCard = ({ name, fee, participants, icon, tournamentId, eventId }) => {
   const navigate = useNavigate();
   const { isPlayerLoggedIn } = useContext(PlayerContext);
 
@@ -18,7 +18,7 @@ const EventCard = ({ name, fee, participants, icon }) => {
     }
 
     // Always proceed to registration for now (temporarily bypassing auth check)
-    navigate('/register', { state: { eventName: name, entryFee: fee } });
+    navigate('/register', { state: { eventName: name, entryFee: fee, TournamentId: tournamentId, eventId: eventId } });
   };
 
   const handleViewFixture = () => {
@@ -41,7 +41,7 @@ const EventCard = ({ name, fee, participants, icon }) => {
           </div>
           <div className="flex justify-between">
             <span>Participants:</span>
-            <span className="font-medium">{participants} Max</span>
+            <span className="font-medium">{participants} </span>
           </div>
         </div>
 

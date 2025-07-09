@@ -22,6 +22,7 @@ interface Tournament {
   imageUrl: string;
   sport: string;
   description?: string;
+  status?: string;
 }
 
 // PlayerContext type definition
@@ -86,12 +87,12 @@ const Tournaments = () => {
   const { selectedLocation } = useContext(AppContext) as AppContextType;
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedFilter, setSelectedFilter] = useState<'all' | 'upcoming' | 'ongoing' | 'past'>('all');
+  const [selectedStatus, setSelectedStatus] = useState<'all' | 'Upcoming' | 'Active' | 'Completed' | 'cancelled'>('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  
+  const [searchTerm, setSearchTerm] = useState('');
   // Add animation state
   const [pageLoaded, setPageLoaded] = useState(false);
-  
+
   useEffect(() => {
     // Set page loaded to true after a short delay to trigger animations
     const timer = setTimeout(() => {
@@ -116,7 +117,9 @@ const Tournaments = () => {
         }
 
         // 3. Now try to parse the JSON response
+        
         const data = await response.json();
+        console.log(data);
         
         if (data.success) {
           const formattedTournaments = data.message.map((tournament: any) => {
@@ -129,7 +132,8 @@ const Tournaments = () => {
               ageGroups: tournament.events?.map((event: any) => event.ageGroup) || [],
               imageUrl: tournament.coverImage,
               sport: tournament.sport,
-              description: tournament.description
+              description: tournament.description,
+              status: tournament.status,
             };
           });
           
@@ -248,13 +252,18 @@ const Tournaments = () => {
   };
 
   const filteredTournaments = useMemo(() => {
-    return tournaments.filter(tournament => {
-      const dateMatch = selectedFilter === 'all' || categorizeDate(tournament.date) === selectedFilter;
-      const categoryMatch = selectedCategory === 'all' || tournament.sport.toLowerCase() === selectedCategory;
-      const locationMatch = selectedLocation === 'all' || tournament.location.includes(selectedLocation);
-      return dateMatch && categoryMatch && locationMatch;
+    return tournaments.filter((tournament) => {
+      const statusMatch = selectedStatus === 'all' || tournament.status === selectedStatus;
+      const categoryMatch = selectedCategory === 'all' || tournament.sport?.toLowerCase() === selectedCategory.toLowerCase();
+      const locationMatch = selectedLocation === 'all' || tournament.location?.toLowerCase() === selectedLocation.toLowerCase();
+      const searchMatch =
+        searchTerm.trim() === '' ||
+        tournament.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tournament.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tournament.sport?.toLowerCase().includes(searchTerm.toLowerCase());
+      return statusMatch && categoryMatch && locationMatch && searchMatch;
     });
-  }, [selectedFilter, selectedCategory, tournaments, selectedLocation]);
+  }, [tournaments, selectedStatus, selectedCategory, selectedLocation, searchTerm]);
 
   const getFilterCount = (filter: 'all' | 'upcoming' | 'ongoing' | 'past') => {
     if (filter === 'all') return tournaments.length;
@@ -268,10 +277,21 @@ const Tournaments = () => {
       
       <Navigation />
       <div className="container mx-auto px-4 py-8">
+      
         <div className={`text-center mb-12 ${pageLoaded ? 'animate-fade-in' : 'opacity-0'}`}>
+          
           <p className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-red-500 via-orange-500 to-red-500 bg-clip-text text-transparent max-w-3xl mx-auto text-center leading-snug mb-8 mt-14">
             Unleash your potential — compete, connect, and conquer tournaments across disciplines!
           </p>
+          <div className="w-full md:w-1/2 mx-auto">
+  <input
+    type="text"
+    value={searchTerm}
+    onChange={e => setSearchTerm(e.target.value)}
+    placeholder="Search tournaments by name, location, or sport..."
+    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+  />
+</div>
         </div>
 
         {loading ? (
@@ -287,35 +307,43 @@ const Tournaments = () => {
             <div className={`flex flex-wrap justify-between items-center mb-8 max-w-6xl mx-auto px-4 ${pageLoaded ? 'animate-slide-up delay-100' : 'opacity-0'}`}>
               
               {/* Filters Group */}
-              <div className="flex flex-wrap gap-4">
-                <Button
-                  variant={selectedFilter === 'all' ? 'default' : 'outline'}
-                  onClick={() => setSelectedFilter('all')}
-                  className="px-6 py-2"
-                >
-                  All ({getFilterCount('all')})
-                </Button>
-                <Button
-                  variant={selectedFilter === 'upcoming' ? 'default' : 'outline'}
-                  onClick={() => setSelectedFilter('upcoming')}
-                  className="px-6 py-2"
-                >
-                  Upcoming ({getFilterCount('upcoming')})
-                </Button>
-                <Button
-                  variant={selectedFilter === 'ongoing' ? 'default' : 'outline'}
-                  onClick={() => setSelectedFilter('ongoing')}
-                  className="px-6 py-2"
-                >
-                  Ongoing ({getFilterCount('ongoing')})
-                </Button>
-                <Button
-                  variant={selectedFilter === 'past' ? 'default' : 'outline'}
-                  onClick={() => setSelectedFilter('past')}
-                  className="px-6 py-2"
-                >
-                  Completed ({getFilterCount('past')})
-                </Button>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                {/* Search Bar */}
+                <div className="flex flex-col md:flex-row w-full md:items-center md:gap-4">
+                  <div className="flex gap-2 flex-wrap mb-2 md:mb-0">
+                    <Button
+                      variant={selectedStatus === 'all' ? 'default' : 'outline'}
+                      onClick={() => setSelectedStatus('all')}
+                      className="px-6 py-2"
+                    >
+                      All ({tournaments.length})
+                    </Button>
+                    <Button
+                      variant={selectedStatus === 'Upcoming' ? 'default' : 'outline'}
+                      onClick={() => setSelectedStatus('Upcoming')}
+                      className="px-6 py-2"
+                    >
+                      Upcoming ({tournaments.filter(t => t.status === 'Upcoming').length})
+                    </Button>
+                    <Button
+                      variant={selectedStatus === 'Active' ? 'default' : 'outline'}
+                      onClick={() => setSelectedStatus('Active')}
+                      className="px-6 py-2"
+                    >
+                      Active ({tournaments.filter(t => t.status === 'Active').length})
+                    </Button>
+                    <Button
+                      variant={selectedStatus === 'Completed' ? 'default' : 'outline'}
+                      onClick={() => setSelectedStatus('Completed')}
+                      className="px-6 py-2"
+                    >
+                      Completed ({tournaments.filter(t => t.status === 'Completed').length})
+                    </Button>
+                  </div>
+                  
+                </div>
+               
+                
               </div>
               
               {/* Display current location filter if active */}
@@ -325,8 +353,7 @@ const Tournaments = () => {
                 </div>
               )}
               
-              {/* Category Dropdown */}
-              <div className="mt-4 md:mt-0">
+              <div className="mt-4 md:mt-0 flex gap-4 items-center">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -334,12 +361,22 @@ const Tournaments = () => {
                   ${selectedCategory === 'all' ? 'bg-transparent text-red-500' : 'bg-transparent text-red-500'}
                 `}
                 >
+                  
                   <option value="all">All Sports</option>
                   <option value="basketball">Basketball</option>
                   <option value="football">Football</option>
                   <option value="cricket">Cricket</option>
                   <option value="badminton">Badminton</option>
+                  <option value="Tennis">Tennis</option>
+                  <option value="Volleyball">Volleyball</option>
+                  <option value="Table Tennis">Table Tennis</option>
+                  <option value="Chess">Chess</option>
+                  <option value="Kabaddi">Kabaddi</option>
+                  <option value="Hockey">Hockey</option>
+                  <option value="Archery">Archery</option>
+                  <option value="Swimming">Swimming</option>
                 </select>
+                
               </div>
             </div>
 
@@ -369,7 +406,7 @@ const Tournaments = () => {
             {filteredTournaments.length === 0 && (
               <div className={`text-center py-12 ${pageLoaded ? 'animate-fade-in delay-200' : 'opacity-0'}`}>
                 <p className="text-muted-foreground text-lg">
-                  No {selectedFilter === 'all' ? '' : selectedFilter} tournaments found
+                  No {selectedStatus === 'all' ? '' : selectedStatus} tournaments found
                   {selectedLocation !== 'all' ? ` in ${selectedLocation}` : ''}.
                 </p>
               </div>

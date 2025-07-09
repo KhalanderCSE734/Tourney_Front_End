@@ -81,6 +81,7 @@ const formatDate = (isoDate) => {
 const Event = () => {
   const location = useLocation();
   const initialTournamentData = location.state;
+  console.log(initialTournamentData);
   const { id } = useParams(); // Get tournament ID from URL
   const navigate = useNavigate();
   
@@ -100,6 +101,7 @@ const Event = () => {
   const tournamentWithDescription = initialTournamentData 
     ? {
         ...initialTournamentData,
+        coverImage: initialTournamentData.imageUrl,
         description: initialTournamentData.description || 
           `# ${initialTournamentData.title || 'Tournament'} Details\n\n` +
           `Welcome to the ${initialTournamentData.title || 'Tournament'}! This is a premier event for ${initialTournamentData.sport || 'sports'} enthusiasts.\n\n` +
@@ -203,7 +205,7 @@ const Event = () => {
             id: event._id,
             name: event.name,
             fee: event.entryFee || 1000,
-            participants: event.maxParticipants || 64,
+            participants: (event.participantsIndividual?.length || 0) + (event.participantsGroup?.length || 0),
             ageGroup: event.ageGroup || "Open",
             icon: getSportIcon(tournament?.sport) || "🎮"
           }));
@@ -293,7 +295,7 @@ const Event = () => {
           <Card className={`bg-card rounded-2xl shadow-lg hover:shadow-xl transition-shadow mb-12 overflow-hidden p-0 ${pageLoaded ? 'animate-slide-up delay-100' : 'opacity-0'}`}>
             <div className="flex flex-col lg:flex-row h-full">
               {/* Image Section */}
-              <div className="lg:w-80 w-full flex-shrink-0 h-72 lg:h-auto relative group">
+              <div className="lg:w-80 w-full flex-shrink-0 h-[500px] lg:h-[400px] relative group">
                 <img
                   src={tournament?.imageUrl || "/placeholder.svg"}
                   alt={tournament?.title}
@@ -330,19 +332,18 @@ const Event = () => {
                     </div>
 
                     <div className="flex items-center text-muted-foreground">
-                      <Users className="w-5 h-5 text-primary mr-2" />
-                      <span className="text-lg">{tournament?.participants || "?"} Participants Expected</span>
+                      
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3">
+                  {/* <div className="flex flex-wrap items-center gap-3">
                     <span className="px-4 py-2 bg-green-100 text-green-800 text-sm font-medium rounded-full">
                       Registration Open
                     </span>
                     <span className="text-sm text-muted-foreground">
                       Deadline: {tournament?.deadline || "TBD"}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -366,13 +367,15 @@ const Event = () => {
                       className={`${pageLoaded ? 'card-animation' : 'opacity-0'}`} 
                       style={{ animationDelay: `${0.2 + (index * 0.1)}s` }}
                     >
-                <EventCard
-                  name={event.name}
-                  fee={event.fee}
-                  participants={event.participants}
-                  icon={event.icon}
-                  onBook={() => console.log(`Registering for ${event.name}`)}
-                />
+                  <EventCard
+                    name={event.name}
+                    fee={event.fee}
+                    participants={event.participants}
+                    icon={event.icon}
+                    tournamentId={initialTournamentData?._id || id}
+                    eventId={event.id}
+                    onBook={() => console.log(`Registering for ${event.name}`)}
+                  />
                     </div>
                   ))
                 ) : (

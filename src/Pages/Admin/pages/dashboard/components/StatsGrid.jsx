@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Grid,
   Card,
@@ -7,22 +7,26 @@ import {
   Stack,
   Container,
   alpha,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import {
   EmojiEvents as TournamentsIcon,
-  Pending as PendingIcon,
   Event as EventsIcon,
+  Groups as OrganizationsIcon,
   People as ParticipantsIcon,
   TrendingUp,
   TrendingDown,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
+import { AdminContext } from "../../../../../Contexts/AdminContext/AdminContext"; // adjust path as needed
+
+const API_BASE_URL = "http://localhost:8000"; // your backend base URL
 
 // Change Indicator (No dots here)
 const ChangeIndicator = ({ change }) => {
   if (!change) return null;
   const isPositive = change.startsWith("+");
-
   return (
     <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1 }}>
       {isPositive ? (
@@ -50,7 +54,7 @@ const CleanCard = ({ title, value, change, icon, accentColor }) => {
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      style={{ width: "100%" }} // Ensure full width
+      style={{ width: "100%" }}
     >
       <Card
         elevation={0}
@@ -64,7 +68,6 @@ const CleanCard = ({ title, value, change, icon, accentColor }) => {
           overflow: "hidden",
           cursor: "pointer",
           transition: "all 0.3s ease",
-          // Explicitly remove any dots/pagination styles
           "& .MuiPagination-root": { display: "none" },
           "& .swiper-pagination": { display: "none !important" },
           "& .slick-dots": { display: "none !important" },
@@ -75,7 +78,6 @@ const CleanCard = ({ title, value, change, icon, accentColor }) => {
             boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
             transform: "translateY(-2px)",
           },
-          // Remove any pseudo-elements that might create dots
           "&::before, &::after": { display: "none" },
         }}
       >
@@ -155,47 +157,103 @@ const CleanCard = ({ title, value, change, icon, accentColor }) => {
   );
 };
 
-// Main Component - ZERO DOTS GUARANTEED
-const StatsGrid = ({
-  totalTournaments = 0,
-  pendingApprovals = 0,
-  activeEvents = 0,
-  totalParticipants = 0,
-}) => {
+const StatsGrid = () => {
+  const { token, isLoggedIn } = useContext(AdminContext);
+  const [loading, setLoading] = useState(true);
+  const [totals, setTotals] = useState({
+    organizations: 0,
+    tournaments: 0,
+    events: 0,
+    players: 0,
+  });
+  const [error, setError] = useState("");
+
+  async function fetchTotals() {
+    if (!isLoggedIn || !token) return;
+    setLoading(true);
+    setError("");
+    try {
+      const [orgRes, tourRes, eventRes, playerRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/admin/total-organizations`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }).then((res) => res.json()),
+        fetch(`${API_BASE_URL}/admin/total-tournaments`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }).then((res) => res.json()),
+        fetch(`${API_BASE_URL}/admin/total-events`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }).then((res) => res.json()),
+        fetch(`${API_BASE_URL}/admin/total-players`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }).then((res) => res.json()),
+      ]);
+      setTotals({
+        organizations: orgRes.totalOrganizations,
+        tournaments: tourRes.totalTournaments,
+        events: eventRes.totalEvents,
+        players: playerRes.totalPlayers,
+      });
+    } catch (err) {
+      setError("Failed to fetch stats.");
+      setTotals({
+        organizations: 0,
+        tournaments: 0,
+        events: 0,
+        players: 0,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchTotals();
+    // eslint-disable-next-line
+  }, [isLoggedIn, token]);
+
   const accentColors = {
+    organizations: "#6366f1",
     tournaments: "#3b82f6",
-    pending: "#f59e0b",
     events: "#06b6d4",
-    participants: "#10b981",
+    players: "#10b981",
   };
 
-  const stats = [
+  const cards = [
     {
-      title: "Total Tournaments",
-      value: totalTournaments,
+      title: "Organizations",
+      value: loading ? <CircularProgress size={28} /> : totals.organizations,
+      icon: <OrganizationsIcon />,
+      accentColor: accentColors.organizations,
+    },
+    {
+      title: "Tournaments",
+      value: loading ? <CircularProgress size={28} /> : totals.tournaments,
       icon: <TournamentsIcon />,
       accentColor: accentColors.tournaments,
     },
     {
-      title: "Pending Approvals",
-      value: pendingApprovals,
-      change: "+6",
-      icon: <PendingIcon />,
-      accentColor: accentColors.pending,
-    },
-    {
-      title: "Active Events",
-      value: activeEvents,
-      change: "-2",
+      title: "Events",
+      value: loading ? <CircularProgress size={28} /> : totals.events,
       icon: <EventsIcon />,
       accentColor: accentColors.events,
     },
     {
-      title: "Total Participants",
-      value: totalParticipants.toLocaleString(),
-      change: "+120",
+      title: "Players",
+      value: loading ? <CircularProgress size={28} /> : totals.players,
       icon: <ParticipantsIcon />,
-      accentColor: accentColors.participants,
+      accentColor: accentColors.players,
     },
   ];
 
@@ -203,7 +261,6 @@ const StatsGrid = ({
     <Box
       sx={{
         width: "100%",
-        // Nuclear option: Kill ALL possible dots
         "& .MuiPagination-root": { display: "none !important" },
         "& .swiper-pagination": { display: "none !important" },
         "& .swiper-pagination-bullet": { display: "none !important" },
@@ -216,18 +273,13 @@ const StatsGrid = ({
       }}
     >
       <Container maxWidth="xl" sx={{ px: { xs: 2, md: 3 }, py: 3 }}>
-        <Grid
-          container
-          spacing={3}
-          sx={{
-            // Extra insurance against dots
-            "& .MuiGrid-item": {
-              "& [class*='dot']": { display: "none !important" },
-              "& [class*='pagination']": { display: "none !important" },
-            },
-          }}
-        >
-          {stats.map((stat, index) => (
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        <Grid container spacing={3}>
+          {cards.map((stat, index) => (
             <Grid
               item
               xs={12}
@@ -238,11 +290,6 @@ const StatsGrid = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.08 }}
-              sx={{
-                // Grid item specific dot removal
-                "& [class*='dot']": { display: "none !important" },
-                "& [class*='pagination']": { display: "none !important" },
-              }}
             >
               <CleanCard {...stat} />
             </Grid>
