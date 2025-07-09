@@ -2,7 +2,22 @@ import { Box, Typography } from "@mui/material";
 import StatsGrid from "./components/StatsGrid";
 import TournamentsTable from "./components/TournamentsTable";
 
+import { AppContext } from "../../../../Contexts/AppContext/AppContext";
+import { useContext } from "react";
+
+import { useEffect } from "react";
+
+
 const DashboardPage = () => {
+
+
+  const { updateTournamentStatus } = useContext(AppContext);
+
+  useEffect(()=>{  
+    updateTournamentStatus();
+  },[]);
+
+
   const dashboardData = {
     stats: {
       totalTournaments: 25,

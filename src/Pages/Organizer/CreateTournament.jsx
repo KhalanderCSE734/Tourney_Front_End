@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
 import { useContext } from 'react';
 
+import { AppContext } from '../../Contexts/AppContext/AppContext';
 
 
 
@@ -65,7 +66,7 @@ const CreateTournament = () => {
 
   const sports = [
     'Badminton', 'Cricket', 'Football', 'Tennis', 'Basketball', 
-    'Volleyball', 'Table Tennis', 'Chess', 'Kabaddi', 'Hockey'
+    'Volleyball', 'Table Tennis', 'Chess', 'Kabaddi', 'Hockey','Archery',
   ];
 
   // Free location search using Nominatim (OpenStreetMap)
@@ -462,6 +463,13 @@ const TournamentDetails = ({ formData, setFormData, onBack }) => {
 
 
   const { backend_URL,  } = useContext(OrganizerContext);
+
+  const { updateTournamentStatus } = useContext(AppContext);
+
+
+  useEffect(()=>{
+    updateTournamentStatus();
+    },[]);
 
   const navigate = useNavigate();
 

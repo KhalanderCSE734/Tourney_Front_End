@@ -7,6 +7,8 @@ import OrganizerSidebar from '../../Components/Organizer/OrganizerSidebar';
 
 import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
 
+import { AppContext } from '../../Contexts/AppContext/AppContext';
+
 import { useContext } from 'react';
 
 
@@ -21,6 +23,14 @@ const OrganizerHome = () => {
 
   const { isOrganizerLoggedIn } = useContext(OrganizerContext);
   const navigate = useNavigate();
+
+
+  const { updateTournamentStatus } = useContext(AppContext);
+
+  useEffect(() => {
+    updateTournamentStatus();
+  }, []);
+
 
   // useEffect(()=>{
   //   if (!isOrganizerLoggedIn) {

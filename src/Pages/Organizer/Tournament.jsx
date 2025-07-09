@@ -86,8 +86,8 @@ const Tournament = () => {
     { id: 'teams', label: 'Teams' },
     { id: 'notifications', label: 'Notifications' },
     { id: 'fixtures', label: 'Fixtures' },
-    { id: 'payment', label: 'Payment' },
     { id: 'live-scoring', label: 'Live Scoring' },
+    { id: 'payment', label: 'Payment' },
     { id: 'settings', label: 'Settings' }
   ];
 

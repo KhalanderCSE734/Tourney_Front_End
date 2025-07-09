@@ -264,12 +264,12 @@ export default function TournamentsTable() {
                   <TableCell align="center" sx={{ fontWeight: 700 }}>
                     Details
                   </TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 700 }}>
+                  {/* <TableCell align="center" sx={{ fontWeight: 700 }}>
                     Participants
                   </TableCell>
                   <TableCell align="center" sx={{ fontWeight: 700 }}>
                     Progress
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -369,7 +369,7 @@ export default function TournamentsTable() {
                       </TableCell>
 
                       {/* Participants */}
-                      <TableCell align="center">
+                      {/* <TableCell align="center">
                         <Stack
                           direction="row"
                           spacing={1}
@@ -383,10 +383,10 @@ export default function TournamentsTable() {
                         </Stack>
                       </TableCell>
 
-                      {/* Progress */}
+                      {/* Progress 
                       <TableCell align="center">
                         <ProgressWithLabel value={t.progress || 0} />
-                      </TableCell>
+                      </TableCell> */}
                     </TableRow>
                   ))
                 )}

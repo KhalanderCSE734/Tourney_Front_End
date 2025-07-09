@@ -37,7 +37,8 @@ const OrganizerContextProvider = (props)=>{
     const navigate = useNavigate();
 
 
-
+    
+    const [isSubmittingMail, setIsSubmittingMail] = useState(false);
 
     
     const getOrganizerData = async ()=>{
@@ -53,7 +54,7 @@ const OrganizerContextProvider = (props)=>{
             const data = await response.json();
 
             if(data.success){
-                console.log(data);
+                // console.log(data);
                 setOrganizerData(data.message);
             }else{
                 console.log(data.message);
@@ -131,7 +132,8 @@ const OrganizerContextProvider = (props)=>{
         organizerData,setOrganizerData,
         organizerMail,setOrganizerMail,
         getAuthStatusOrganizer, 
-        fetchTournamentDetails, tournament
+        fetchTournamentDetails, tournament,
+        isSubmittingMail, setIsSubmittingMail
     };
     
     
