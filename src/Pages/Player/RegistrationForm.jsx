@@ -162,7 +162,7 @@ const RegistrationForm = () => {
       }));
       try {
         const res = await fetch(
-          `${backend_URL}/api/organizer/createGroupTeam/${TournamentId}/${eventId}`,
+          `${backend_URL}/api/player/createGroupTeam/${TournamentId}/${eventId}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -192,7 +192,7 @@ const RegistrationForm = () => {
       };
       try {
         const res = await fetch(
-          `${backend_URL}/api/organizer/createIndividualTeam/${TournamentId}/${eventId}`,
+          `${backend_URL}/api/player/createIndividualTeam/${TournamentId}/${eventId}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -215,6 +215,7 @@ const RegistrationForm = () => {
       toast.success('Registration submitted successfully!');
       // Optionally, redirect or clear form
     } else {
+      console.log("Error in registration:", errorMsg);
       toast.error(`Error: ${errorMsg}`);
     }
   };

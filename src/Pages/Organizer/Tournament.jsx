@@ -92,10 +92,10 @@ const Tournament = () => {
   ];
 
   const stats = [
-    { label: 'Total Events', value: tournamentData.totalEvents, icon: <IoTrophyOutline />, color: '#4f46e5' },
-    { label: 'Registered Players', value: tournamentData.registeredPlayers, icon: <IoPeopleOutline />, color: '#10b981' },
-    { label: 'Completed Matches', value: tournamentData.completedMatches, icon: <IoStatsChartOutline />, color: '#8b5cf6' },
-    { label: 'Revenue', value: tournamentData.revenue, icon: <IoTrophyOutline />, color: '#f59e0b' }
+    // { label: 'Total Events', value: tournamentData.totalEvents, icon: <IoTrophyOutline />, color: '#4f46e5' },
+    // { label: 'Registered Players', value: tournamentData.registeredPlayers, icon: <IoPeopleOutline />, color: '#10b981' },
+    // { label: 'Completed Matches', value: tournamentData.completedMatches, icon: <IoStatsChartOutline />, color: '#8b5cf6' },
+    // { label: 'Revenue', value: tournamentData.revenue, icon: <IoTrophyOutline />, color: '#f59e0b' }
   ];
 
 

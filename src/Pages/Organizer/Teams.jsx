@@ -780,6 +780,9 @@ const Teams = () => {
     }
   }
 
+
+
+  
   useEffect(()=>{ 
     if(selectedEventId){
       fetchTeams();

@@ -209,6 +209,7 @@ const Event = () => {
             ageGroup: event.ageGroup || "Open",
             icon: getSportIcon(tournament?.sport) || "🎮"
           }));
+          
           setEvents(formattedEvents);
         } else {
           // Fallback to demo data if API fails

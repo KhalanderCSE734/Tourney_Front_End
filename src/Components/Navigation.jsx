@@ -112,7 +112,7 @@ const Navigation = () => {
               onChange={handleLocationChange}
             >
               <option value="all" className="text-black">All Locations</option>
-              <option value="Bangalore" className="text-black">Bengaluru</option>
+              <option value="Bengaluru" className="text-black">Bengaluru</option>
               <option value="Delhi" className="text-black">Delhi</option>
               <option value="Kolkata" className="text-black">Kolkata</option>
               <option value="Chennai" className="text-black">Chennai</option>

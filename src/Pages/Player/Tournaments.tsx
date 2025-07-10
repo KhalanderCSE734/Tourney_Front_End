@@ -255,7 +255,7 @@ const Tournaments = () => {
     return tournaments.filter((tournament) => {
       const statusMatch = selectedStatus === 'all' || tournament.status === selectedStatus;
       const categoryMatch = selectedCategory === 'all' || tournament.sport?.toLowerCase() === selectedCategory.toLowerCase();
-      const locationMatch = selectedLocation === 'all' || tournament.location?.toLowerCase() === selectedLocation.toLowerCase();
+    const locationMatch = selectedLocation === 'all' || (tournament.location && tournament.location.toLowerCase().includes(selectedLocation.toLowerCase()));
       const searchMatch =
         searchTerm.trim() === '' ||
         tournament.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||

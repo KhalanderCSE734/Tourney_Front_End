@@ -2,7 +2,23 @@ import React, { useState } from 'react';
 import './CSS/Scores.css';
 import { IoAdd, IoSearchOutline, IoFilterOutline, IoEyeOutline, IoCreateOutline, IoTrashOutline, IoTrophyOutline, IoStatsChartOutline, IoCalendarOutline, IoClose, IoCheckmarkCircle, IoTimeOutline, IoRefreshOutline, IoSaveOutline } from 'react-icons/io5';
 
+import { useEffect } from 'react';
+
+import { toast } from 'react-toastify';
+
+
+import { OrganizerContext } from '../../Contexts/OrganizerContext/OrganizerContext';
+import { useContext } from 'react';
+
+import { useParams } from 'react-router-dom';
+
 const Scores = () => {
+
+  const { backend_URL } = useContext(OrganizerContext);
+
+  const { id } = useParams();
+
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterEvent, setFilterEvent] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -10,7 +26,10 @@ const Scores = () => {
   const [selectedMatch, setSelectedMatch] = useState(null);
 
   // Mock events data
-  const events = ['U9 BS', 'U9 GS', 'U11 BS', 'U11 GS', 'U13 BS', 'U13 GS', 'U15 BS', 'U15 GS', 'U17 BS', 'U17 GS'];
+  // const events = ['U9 BS', 'U9 GS', 'U11 BS', 'U11 GS', 'U13 BS', 'U13 GS', 'U15 BS', 'U15 GS', 'U17 BS', 'U17 GS'];
+
+  const [events,seEvents] = useState([]);
+
 
   // Mock matches data for live scoring
   const [matches, setMatches] = useState([
@@ -107,6 +126,45 @@ const Scores = () => {
     }
   };
 
+
+    const fetchAllMatches = async (req,res)=>{
+  
+      try{
+        const fetchOptions = {
+          method:"GET",
+          credentials:"include",
+        }
+  
+        const response = await fetch(`${backend_URL}/api/organizer/allEvents/${id}`,fetchOptions);
+        const data = await response.json();
+  
+        if(data.success){
+          // toast.success(data.message);
+          console.log(data.message);
+          let eventsName = [];
+          data.message.forEach((event)=>{
+            eventsName.push(event.name);
+          })
+          seEvents(eventsName);
+
+        }else{
+          console.log(data);
+          toast.error(data.message);
+        }
+      }catch(error){
+          console.log("Error in Front-End Create Tournament Handler ", error);
+          toast.error(error);
+      } 
+  
+    }
+
+    useEffect(()=>{ 
+      fetchAllMatches();
+    },[]);
+
+
+
+
   return (
     <div className="scores-container">
       {/* Scores Header */}
@@ -118,7 +176,7 @@ const Scores = () => {
       </div>
 
       {/* Score Statistics */}
-      <div className="scores-stats-grid">
+      {/* <div className="scores-stats-grid">
         <div className="scores-stat-card">
           <div className="scores-stat-content">
             <div className="scores-stat-text">
@@ -163,7 +221,7 @@ const Scores = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Scores Controls */}
       <div className="scores-controls">
